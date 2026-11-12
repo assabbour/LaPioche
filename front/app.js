@@ -113,13 +113,22 @@ function gameCard(game) {
     : el("span", { class: "badge busy" }, "Emprunté");
 
   const actions = el("div", { class: "actions" });
-
+  // Afficher Emprunter ou Rendre selon la disponibilité.
   if (game.isAvailable) {
-    actions.append(button("Emprunter", () => openBorrowDialog(game), "primary"));
+    actions.append(
+      button("Emprunter", () => openBorrowDialog(game), "primary")
+    );
   } else if (game.activeLoanID) {
-    // FEAT-03 : Afficher le bouton Rendre pour un jeu emprunté.
-    actions.append(button("Rendre", () => returnGame(game), "primary"));
+    actions.append(
+      button("Rendre", () => returnGame(game), "primary")
+    );
   }
+
+  // FEAT-01 : Actions de modification et de suppression.
+  actions.append(
+    button("Modifier", () => openEditGameDialog(game)),
+    button("Supprimer", () => deleteGame(game))
+  );
 
   return el(
     "li",
@@ -130,23 +139,68 @@ function gameCard(game) {
   );
 }
 
+// FEAT-01 : Supprimer un jeu après confirmation.
+async function deleteGame(game) {
+  const confirmed = confirm(
+    `Voulez-vous vraiment supprimer « ${game.title} » ?`
+  );
+
+  if (!confirmed) return;
+
+  await run(async () => {
+    await api.deleteGame(game.id);
+
+    toast(`« ${game.title} » a bien été supprimé.`);
+
+    await refresh();
+  });
+}
+
 const gameDialog = $("#game-dialog");
 const gameForm = $("#game-form");
 
+// FEAT-01 : Jeu en cours de modification (null = création).
+let editingGame = null;
+
+function openEditGameDialog(game) {
+  editingGame = game;
+
+  $("#game-dialog-title").textContent = "Modifier un jeu";
+
+  gameForm.elements.namedItem("title").value = game.title;
+  gameForm.elements.namedItem("minPlayers").value = game.minPlayers;
+  gameForm.elements.namedItem("maxPlayers").value = game.maxPlayers;
+  gameForm.elements.namedItem("durationMinutes").value = game.durationMinutes;
+
+  showFormError(gameDialog, null);
+  gameDialog.showModal();
+}
+
 $("#add-game").addEventListener("click", () => {
+  editingGame = null;
+
   gameForm.reset();
+  $("#game-dialog-title").textContent = "Ajouter un jeu";
+
   showFormError(gameDialog, null);
   gameDialog.showModal();
 });
 
-bindSubmit(gameDialog, gameForm, (data) =>
-  api.createGame({
+// FEAT-01 : Créer ou modifier un jeu selon le contexte.
+bindSubmit(gameDialog, gameForm, (data) => {
+  const game = {
     title: data.get("title").trim(),
     minPlayers: Number(data.get("minPlayers")),
     maxPlayers: Number(data.get("maxPlayers")),
     durationMinutes: Number(data.get("durationMinutes")),
-  }),
-);
+  };
+
+  if (editingGame) {
+    return api.updateGame(editingGame.id, game);
+  }
+
+  return api.createGame(game);
+});
 
 // --- Emprunts --------------------------------------------------------------
 

@@ -105,4 +105,108 @@ final class GameTests: XCTestCase {
             })
         }
     }
+
+    // FEAT-01 : Vérifier qu'un jeu peut être modifié.
+    func testUpdateGame() async throws {
+        try await withApp { app in
+
+            let game = try await createGame(app, title: "Catan")
+            let id = try XCTUnwrap(game.id)
+
+            try await app.test(.PUT, "games/\(id)", beforeRequest: { req in
+                try req.content.encode(CreateGameDTO(
+                    title: "Catan Nouvelle Édition",
+                    minPlayers: 2,
+                    maxPlayers: 6,
+                    durationMinutes: 120
+                ))
+            }, afterResponse: { res async throws in
+
+                XCTAssertEqual(res.status, .ok)
+
+                let updatedGame = try res.content.decode(GameDTO.self)
+                XCTAssertEqual(updatedGame.id, id)
+                XCTAssertEqual(updatedGame.title, "Catan Nouvelle Édition")
+                XCTAssertEqual(updatedGame.minPlayers, 2)
+                XCTAssertEqual(updatedGame.maxPlayers, 6)
+                XCTAssertEqual(updatedGame.durationMinutes, 120)
+            })
+
+            try await app.test(.GET, "games/\(id)", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .ok)
+
+                let savedGame = try res.content.decode(GameDTO.self)
+                XCTAssertEqual(savedGame.title, "Catan Nouvelle Édition")
+                XCTAssertEqual(savedGame.maxPlayers, 6)
+            })
+        }
+    }
+
+    // FEAT-01 : Retourner HTTP 404 si le jeu à modifier n'existe pas.
+    func testUpdateUnknownGameReturnsNotFound() async throws {
+        try await withApp { app in
+            try await app.test(.PUT, "games/\(UUID())", beforeRequest: { req in
+                try req.content.encode(CreateGameDTO(
+                    title: "Catan",
+                    minPlayers: 2,
+                    maxPlayers: 4,
+                    durationMinutes: 90
+                ))
+            }, afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .notFound)
+            })
+        }
+    }
+
+    // FEAT-01 : Vérifier qu'un jeu peut être supprimé.
+    func testDeleteGame() async throws {
+        try await withApp { app in
+            let game = try await createGame(app)
+            let id = try XCTUnwrap(game.id)
+
+            try await app.test(.DELETE, "games/\(id)", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .noContent)
+            })
+
+            try await app.test(.GET, "games/\(id)", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .notFound)
+            })
+        }
+    }
+
+    func testDeleteUnknownGameReturnsNotFound() async throws {
+        try await withApp { app in
+            try await app.test(.DELETE, "games/\(UUID())", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .notFound)
+            })
+        }
+    }
+
+    // FEAT-01 : Empêcher la suppression d'un jeu ayant un historique d'emprunts.
+    func testDeleteGameWithLoanHistoryReturnsConflict() async throws {
+        try await withApp { app in
+
+            let game = try await createGame(app)
+            let member = try await createMember(app)
+            let gameID = try XCTUnwrap(game.id)
+            let memberID = try XCTUnwrap(member.id)
+
+            try await app.test(.POST, "loans", beforeRequest: { req in
+                try req.content.encode(CreateLoanDTO(
+                    gameID: gameID,
+                    memberID: memberID
+                ))
+            }, afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .created)
+            })
+
+            try await app.test(.DELETE, "games/\(gameID)", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .conflict)
+            })
+
+            try await app.test(.GET, "games/\(gameID)", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .ok)
+            })
+        }
+    }
 }

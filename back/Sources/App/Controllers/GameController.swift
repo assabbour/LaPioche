@@ -7,6 +7,10 @@ struct GameController: RouteCollection {
         games.get(use: index)
         games.post(use: create)
         games.get(":gameID", use: show)
+        // FEAT-01 : Modifier un jeu existant.
+        games.put(":gameID", use: update)
+        // FEAT-01 : Supprimer un jeu existant.
+        games.delete(":gameID", use: delete)
     }
 
     @Sendable
@@ -35,6 +39,32 @@ struct GameController: RouteCollection {
     @Sendable
     func show(req: Request) async throws -> GameDTO {
         try await findGame(req).toDTO()
+    }
+
+    // FEAT-01 : Modifier les informations d'un jeu existant.
+    @Sendable
+    func update(req: Request) async throws -> GameDTO {
+        try CreateGameDTO.validate(content: req)
+        let dto = try req.content.decode(CreateGameDTO.self)
+        try dto.ensureConsistentPlayerCount()
+        let game = try await findGame(req)
+        game.title = dto.title
+        game.minPlayers = dto.minPlayers
+        game.maxPlayers = dto.maxPlayers
+        game.durationMinutes = dto.durationMinutes
+        try await game.save(on: req.db)
+        return game.toDTO()
+    }
+
+    // FEAT-01 : Supprimer un jeu sans historique d'emprunts.
+    @Sendable
+    func delete(req: Request) async throws -> HTTPStatus {
+        let game = try await findGame(req)
+        guard game.loans.isEmpty else {
+            throw Abort(.conflict, reason: "Game has loan history")
+        }
+        try await game.delete(on: req.db)
+        return .noContent
     }
 
     private func findGame(_ req: Request) async throws -> Game {

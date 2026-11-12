@@ -34,7 +34,7 @@ const knownMessages = {
   "Invalid loan id": "L'identifiant de l'emprunt n'est pas valide.",
   "Game already on loan": "Ce jeu est déjà emprunté : il faut d'abord le rendre.",
   "Loan is already returned": "Cet emprunt a déjà été rendu.",
-  "A game with loans cannot be deleted":
+  "Game has loan history":
     "Suppression impossible : ce jeu a un historique d'emprunts, conservé même quand le jeu est rendu.",
   "A member with loans cannot be deleted":
     "Suppression impossible : cet·te adhérent·e a un historique d'emprunts, conservé même quand tout est rendu.",
@@ -109,6 +109,12 @@ async function request(method, path, body) {
 export const api = {
   listGames: () => request("GET", "/games"),
   createGame: (game) => request("POST", "/games", game),
+
+  // FEAT-01 : Modifier un jeu.
+  updateGame: (id, game) => request("PUT", `/games/${id}`, game),
+
+  // FEAT-01 : Supprimer un jeu.
+  deleteGame: (id) => request("DELETE", `/games/${id}`),
 
   listMembers: () => request("GET", "/members"),
   createMember: (member) => request("POST", "/members", member),
