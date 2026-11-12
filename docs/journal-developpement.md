@@ -57,3 +57,19 @@ Problème : Le message d'erreur HTTP 409 renvoyé par l'API ne correspondait pas
 Correction : Harmonisation du message Game already on loan entre l'API, le frontend et les tests.
 
 Test : 20 tests frontend réussis, 0 échec.
+
+## BUG-06 — Retour d'un jeu emprunté
+
+Fichiers : LoanController.swift, GameDTO.swift, LoanTests.swift, front/api.js, front/app.js
+
+Problème : Un jeu emprunté restait indisponible sans possibilité de le rendre depuis l'interface.
+
+Correction : Ajout de la route POST /loans/{loanID}/return, de l'identifiant activeLoanID dans GameDTO et du bouton Rendre dans le frontend.
+
+Test : testReturnedGameBecomesAvailable — Réussi. 20 tests backend réussis, 0 échec.
+
+Résultat : Le bouton Rendre apparaît pour les jeux empruntés.
+
+
+
+

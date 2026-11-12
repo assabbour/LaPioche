@@ -114,4 +114,5 @@ export const api = {
   createMember: (member) => request("POST", "/members", member),
 
   borrow: (gameID, memberID) => request("POST", "/loans", { gameID, memberID }),
+  returnLoan: (loanID) => request("POST", `/loans/${loanID}/return`),
 };

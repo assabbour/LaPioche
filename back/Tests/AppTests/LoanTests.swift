@@ -94,4 +94,38 @@ final class LoanTests: XCTestCase {
             }
         }
     }
+
+    // BUG-06 : Vérifier qu'un jeu redevient disponible après son retour.
+    func testReturnedGameBecomesAvailable() async throws {
+        try await withApp { app in
+            let game = try await createGame(app)
+            let member = try await createMember(app)
+            let gameID = try XCTUnwrap(game.id)
+
+            var loanID: UUID?
+
+            try await borrow(
+                app,
+                gameID: gameID,
+                memberID: try XCTUnwrap(member.id)
+            ) { res in
+                let loan = try res.content.decode(LoanDTO.self)
+                loanID = loan.id
+            }
+
+            let id = try XCTUnwrap(loanID)
+
+            try await app.test(.POST, "loans/\(id)/return") { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                let loan = try res.content.decode(LoanDTO.self)
+                XCTAssertNotNil(loan.returnedAt)
+            }
+
+            try await app.test(.GET, "games/\(gameID)") { res async throws in
+                let game = try res.content.decode(GameDTO.self)
+                XCTAssertTrue(game.isAvailable)
+                XCTAssertNil(game.activeLoanID)
+            }
+        }
+    }
 }

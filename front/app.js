@@ -98,13 +98,18 @@ async function loadGames() {
 function gameCard(game) {
   const players =
     game.minPlayers === game.maxPlayers ? `${game.minPlayers}` : `${game.minPlayers} à ${game.maxPlayers}`;
+
   const status = game.isAvailable
     ? el("span", { class: "badge ok" }, "Disponible")
     : el("span", { class: "badge busy" }, "Emprunté");
 
   const actions = el("div", { class: "actions" });
+
   if (game.isAvailable) {
     actions.append(button("Emprunter", () => openBorrowDialog(game), "primary"));
+  } else if (game.activeLoanID) {
+    // BUG-06 : Afficher le bouton Rendre pour un jeu emprunté.
+    actions.append(button("Rendre", () => returnGame(game), "primary"));
   }
 
   return el(
@@ -135,6 +140,15 @@ bindSubmit(gameDialog, gameForm, (data) =>
 );
 
 // --- Emprunts --------------------------------------------------------------
+
+// BUG-06 : Enregistrer le retour du jeu et actualiser la liste.
+async function returnGame(game) {
+  await run(async () => {
+    await api.returnLoan(game.activeLoanID);
+    toast(`« ${game.title} » a bien été rendu.`);
+    await refresh();
+  });
+}
 
 const borrowDialog = $("#borrow-dialog");
 const borrowForm = $("#borrow-form");

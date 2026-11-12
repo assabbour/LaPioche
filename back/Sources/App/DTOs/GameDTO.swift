@@ -7,6 +7,8 @@ struct GameDTO: Content {
     let maxPlayers: Int
     let durationMinutes: Int
     let isAvailable: Bool
+    // Identifiant de l'emprunt actif pour permettre le retour du jeu.
+    let activeLoanID: UUID?
 }
 
 extension Game {
@@ -17,7 +19,9 @@ extension Game {
             minPlayers: minPlayers,
             maxPlayers: maxPlayers,
             durationMinutes: durationMinutes,
-            isAvailable: isAvailable
+            isAvailable: isAvailable,
+            // BUG-06 : Transmettre l'ID de l'emprunt non rendu au frontend.
+            activeLoanID: $loans.value?.first(where: { $0.returnedAt == nil })?.id
         )
     }
 }
