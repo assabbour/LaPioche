@@ -18,6 +18,16 @@ struct LoanController: RouteCollection {
             throw Abort(.notFound, reason: "Member not found")
         }
 
+        // BUG-03 : Empêcher un nouvel emprunt si le jeu est déjà emprunté.
+        let activeLoan = try await Loan.query(on: req.db)
+            .filter(\.$game.$id == dto.gameID)
+            .filter(\.$returnedAt == nil)
+            .first()
+
+        guard activeLoan == nil else {
+            throw Abort(.conflict, reason: "Game already on loan")
+        }
+
         let now = Date()
         let loan = Loan(
             gameID: try game.requireID(),

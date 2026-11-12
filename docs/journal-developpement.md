@@ -23,3 +23,15 @@
 **Test :** `testDueDateIsFourteenDaysAfterBorrowDate` — Réussi.
 
 **Commit :** `fix: set loan duration to 14 days`
+
+## BUG-03 — Empêcher le double emprunt
+
+**Fichier :** `LoanController.swift`
+
+**Problème :** Un jeu déjà emprunté pouvait être emprunté une deuxième fois.
+
+**Correction :** J'ai ajouté une vérification des emprunts actifs avant de créer un nouvel emprunt. Si le jeu n'est pas rendu, l'API retourne `409 Conflict`.
+
+**Test :** `testBorrowingAGameAlreadyOnLoanReturnsConflict` — Réussi.
+
+**Commit :** `fix: prevent duplicate game loans`
