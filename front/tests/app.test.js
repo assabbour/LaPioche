@@ -90,6 +90,33 @@ test("borrowing without any member explains that one must be added first", async
   assertTrue(!app.$("#borrow-dialog").open, "la boîte d'emprunt ne doit pas s'ouvrir");
 });
 
+// BUG-06 : Rendre un jeu emprunté et vérifier sa disponibilité.
+test("returning a game makes it available again", async () => {
+  const borrowedGame = { ...dixit, activeLoanID: "l1" };
+
+  const app = await mountApp({
+    "GET /games": [borrowedGame],
+    "POST /loans/l1/return": [200, {
+      id: "l1",
+      returnedAt: new Date().toISOString(),
+    }],
+  });
+
+  await waitFor(() => app.$$("#games-list .card").length === 1);
+  assertIncludes(cardOf(app, "Dixit").textContent, "Rendre");
+  app.click("Rendre", cardOf(app, "Dixit"));
+  await waitFor(
+    () => app.calls.some(
+      (call) => call.method === "POST" && call.path === "/loans/l1/return"
+    ),
+    "l'appel POST /loans/l1/return"
+  );
+  await waitFor(
+    () => app.$("#toasts").textContent.includes("a bien été rendu"),
+    "le message de retour"
+  );
+});
+
 // --- Adhérent·es
 
 test("members tab lists the members", async () => {
