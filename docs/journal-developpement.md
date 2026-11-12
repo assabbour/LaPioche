@@ -11,3 +11,15 @@
 **Test :** `testCreateGameReturnsCreated` — Réussi.
 
 **Commit :** `fix: return 201 when creating a game`
+
+## BUG-02 — Durée d'emprunt (14 jours)
+
+**Fichier :** `Loan.swift`
+
+**Problème :** La durée d'emprunt était de 13 jours au lieu de 14.
+
+**Correction :** J'ai modifié la constante `durationInDays` de 13 à 14.
+
+**Test :** `testDueDateIsFourteenDaysAfterBorrowDate` — Réussi.
+
+**Commit :** `fix: set loan duration to 14 days`

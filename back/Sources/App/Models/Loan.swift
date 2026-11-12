@@ -3,7 +3,8 @@ import Vapor
 
 final class Loan: Model, @unchecked Sendable {
     static let schema = "loans"
-    static let durationInDays = 13
+    // BUG-02 : Fixer la durée d'emprunt à 14 jours.
+    static let durationInDays = 14
 
     @ID(key: .id)
     var id: UUID?
