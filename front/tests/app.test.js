@@ -155,3 +155,39 @@ test("an email already in use is shown in French", async () => {
   await waitFor(() => !app.$("#member-dialog .form-error").hidden, "le message d'erreur");
   assertIncludes(app.$("#member-dialog .form-error").textContent, "utilise déjà cette adresse e-mail");
 });
+
+// --- Historique des emprunts -----------------------------------------------
+
+// BUG-07 : Vérifier l'affichage de l'historique des emprunts.
+test("loan history shows game, member, dates and return status", async () => {
+  const loan = {
+    id: "l1",
+    gameID: "g1",
+    memberID: "m1",
+    borrowedAt: "2026-11-12T14:30:11Z",
+    dueAt: "2026-11-26T14:30:11Z",
+    returnedAt: "2026-11-12T17:26:44Z",
+  };
+
+  const app = await mountApp(
+    {
+      "GET /loans": [loan],
+      "GET /games": [catan],
+      "GET /members": [camille],
+    },
+    { hash: "#loans" },
+  );
+
+  await waitFor(
+    () => app.$$("#loans-list .row").length === 1,
+    "l'historique des emprunts",
+  );
+
+  const history = app.$("#loans-list").textContent;
+
+  assertIncludes(history, "Catan");
+  assertIncludes(history, "Camille");
+  assertIncludes(history, "Emprunté le 12 novembre 2026");
+  assertIncludes(history, "Retour prévu le 26 novembre 2026");
+  assertIncludes(history, "Rendu le 12 novembre 2026");
+});

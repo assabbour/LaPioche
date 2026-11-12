@@ -113,6 +113,10 @@ export const api = {
   listMembers: () => request("GET", "/members"),
   createMember: (member) => request("POST", "/members", member),
 
+  // BUG-07 : Récupérer l'historique des emprunts.
+  listLoans: () => request("GET", "/loans"),
+
   borrow: (gameID, memberID) => request("POST", "/loans", { gameID, memberID }),
+
   returnLoan: (loanID) => request("POST", `/loans/${loanID}/return`),
 };

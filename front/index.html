@@ -12,6 +12,7 @@
     <nav aria-label="Sections">
       <a href="#games" data-tab="games">Jeux</a>
       <a href="#members" data-tab="members">Adhérent·es</a>
+      <a href="#loans" data-tab="loans">Historique</a>
     </nav>
     <a class="docs-link" id="docs-link" href="http://localhost:8081/">Documentation API</a>
   </header>
@@ -33,6 +34,18 @@
       </div>
       <p id="members-empty" class="empty" hidden>Aucun·e adhérent·e pour le moment. Cliquez sur « Ajouter un·e adhérent·e » pour créer le premier ou la première.</p>
       <ul id="members-list" class="rows"></ul>
+    </section>
+    <!-- BUG-07 : Afficher l'historique des emprunts. -->
+    <section id="loans" class="tab" hidden>
+      <div class="section-head">
+        <h2>Historique des emprunts</h2>
+      </div>
+
+      <p id="loans-empty" class="empty" hidden>
+        Aucun emprunt enregistré pour le moment.
+      </p>
+
+      <ul id="loans-list" class="rows"></ul>
     </section>
   </main>
 

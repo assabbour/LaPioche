@@ -7,6 +7,18 @@ struct LoanController: RouteCollection {
         loans.post(use: create)
         // BUG-06 : Ajouter la route permettant de rendre un jeu emprunté.
         loans.post(":loanID", "return", use: returnGame)
+        // BUG-07 : Consulter l'historique des emprunts.
+        loans.get(use: index)
+    }
+
+    // BUG-07 : Récupérer tous les emprunts, du plus récent au plus ancien.
+    @Sendable
+    func index(req: Request) async throws -> [LoanDTO] {
+        let loans = try await Loan.query(on: req.db)
+            .sort(\.$borrowedAt, .descending)
+            .all()
+
+        return loans.map { $0.toDTO() }
     }
 
     @Sendable

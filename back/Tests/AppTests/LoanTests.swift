@@ -128,4 +128,40 @@ final class LoanTests: XCTestCase {
             }
         }
     }
+
+    // BUG-07 : Vérifier que l'historique contient les emprunts du plus récent au plus ancien.
+    func testLoanHistoryReturnsNewestFirst() async throws {
+        try await withApp { app in
+            let game1 = try await createGame(app)
+            let game2 = try await createGame(app)
+            let member = try await createMember(app)
+
+            let gameID1 = try XCTUnwrap(game1.id)
+            let gameID2 = try XCTUnwrap(game2.id)
+            let memberID = try XCTUnwrap(member.id)
+
+            try await borrow(app, gameID: gameID1, memberID: memberID) { _ in }
+            try await borrow(app, gameID: gameID2, memberID: memberID) { _ in }
+
+            let loans = try await Loan.query(on: app.db).all()
+
+            for loan in loans {
+                loan.borrowedAt = loan.$game.id == gameID1
+                    ? Date(timeIntervalSince1970: 1_700_000_000)
+                    : Date(timeIntervalSince1970: 1_700_086_400)
+
+                try await loan.save(on: app.db)
+            }
+
+            try await app.test(.GET, "loans") { res async throws in
+                XCTAssertEqual(res.status, .ok)
+
+                let history = try res.content.decode([LoanDTO].self)
+
+                XCTAssertEqual(history.count, 2)
+                XCTAssertEqual(history[0].gameID, gameID2)
+                XCTAssertEqual(history[1].gameID, gameID1)
+            }
+        }
+    }
 }

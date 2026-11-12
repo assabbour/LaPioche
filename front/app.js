@@ -69,7 +69,8 @@ function bindSubmit(dialog, form, handler) {
 
 // --- Onglets ---------------------------------------------------------------
 
-const tabs = ["games", "members"];
+// BUG-07 : Ajouter l'onglet Historique.
+const tabs = ["games", "members", "loans"];
 
 function currentTab() {
   const name = location.hash.slice(1);
@@ -78,11 +79,19 @@ function currentTab() {
 
 async function refresh() {
   const tab = currentTab();
+
   for (const name of tabs) {
     $(`#${name}`).hidden = name !== tab;
     $(`[data-tab="${name}"]`).toggleAttribute("aria-current", name === tab);
   }
-  await run(tab === "games" ? loadGames : loadMembers);
+
+  const loaders = {
+    games: loadGames,
+    members: loadMembers,
+    loans: loadLoans,
+  };
+
+  await run(loaders[tab]);
 }
 
 window.addEventListener("hashchange", refresh);
@@ -205,4 +214,48 @@ bindSubmit(memberDialog, memberForm, (data) =>
   api.createMember({ name: data.get("name").trim(), email: data.get("email").trim() }),
 );
 
+// --- Historique des emprunts -----------------------------------------------
+
+// BUG-07 : Charger les emprunts et retrouver les noms des jeux et adhérent·es.
+async function loadLoans() {
+  const [loans, games, members] = await Promise.all([
+    api.listLoans(),
+    api.listGames(),
+    api.listMembers(),
+  ]);
+
+  $("#loans-empty").hidden = loans.length > 0;
+
+  $("#loans-list").replaceChildren(
+    ...loans.map((loan) => {
+      const game = games.find((g) => g.id === loan.gameID);
+      const member = members.find((m) => m.id === loan.memberID);
+
+      const status = loan.returnedAt ? "Rendu" : "En cours";
+
+      return el(
+        "li",
+        { class: "row" },
+        el(
+          "div",
+          { class: "row-main" },
+          el("p", {}, el("strong", {}, game?.title ?? "Jeu inconnu")),
+          el("p", { class: "meta" }, member?.name ?? "Adhérent·e inconnu·e"),
+          el("p", { class: "meta" }, `Emprunté le ${formatDate(loan.borrowedAt)}`),
+          el("p", { class: "meta" }, `Retour prévu le ${formatDate(loan.dueAt)}`),
+          el(
+            "p",
+            { class: "meta" },
+            loan.returnedAt
+              ? `Rendu le ${formatDate(loan.returnedAt)}`
+              : status,
+          ),
+        ),
+      );
+    }),
+  );
+}
+
 refresh();
+
+

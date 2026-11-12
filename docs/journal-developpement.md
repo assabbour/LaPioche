@@ -60,16 +60,32 @@ Test : 20 tests frontend réussis, 0 échec.
 
 ## BUG-06 — Retour d'un jeu emprunté
 
-Fichiers : LoanController.swift, GameDTO.swift, LoanTests.swift, front/api.js, front/app.js
+**Fichiers :** `LoanController.swift`, `GameDTO.swift`, `LoanTests.swift`, `front/api.js`, `front/app.js`, `front/tests/app.test.js`.
 
-Problème : Un jeu emprunté restait indisponible sans possibilité de le rendre depuis l'interface.
+**Problème :** Un jeu emprunté restait indisponible sans possibilité de le rendre depuis l'interface.
 
-Correction : Ajout de la route POST /loans/{loanID}/return, de l'identifiant activeLoanID dans GameDTO et du bouton Rendre dans le frontend.
+**Correction :** Ajout de la route `POST /loans/{loanID}/return`, du champ `activeLoanID` dans `GameDTO` et du bouton **Rendre** dans le frontend. Après le retour, le jeu redevient disponible et peut être emprunté à nouveau.
 
-Test : testReturnedGameBecomesAvailable — Réussi. 20 tests backend réussis, 0 échec.
+**Tests :**
+- Backend : `testReturnedGameBecomesAvailable` — 20 tests réussis, 0 échec.
+- Frontend : `returning a game makes it available again` — 21 tests réussis, 0 échec.
+- Validation manuelle : bouton **Rendre** → **Disponible** → **Emprunter**.
 
-Résultat : Le bouton Rendre apparaît pour les jeux empruntés.
+**Résultat :** Le retour d'un jeu fonctionne de bout en bout. Le BUG-06 est fusionné dans `main` et synchronisé sur GitHub (commit `0752fd6`).
 
+## BUG-07 — Historique des emprunts
 
+**Fichiers :** `LoanController.swift`, `LoanTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`, `front/tests/app.test.js`.
+
+**Problème :** L'application ne permettait pas de consulter l'historique des emprunts.
+
+**Correction :** Ajout de la route `GET /loans` et d'un onglet **Historique** affichant le jeu, l'adhérent, les dates d'emprunt et de retour, ainsi que l'état de l'emprunt.
+
+**Tests :**
+- Backend : `testLoanHistoryReturnsNewestFirst` — 21 tests réussis, 0 échec.
+- Frontend : `loan history shows game, member, dates and return status` — 22 tests réussis, 0 échec.
+- Validation manuelle : affichage d'un emprunt rendu depuis l'interface.
+
+**Résultat :** L'historique des emprunts fonctionne de bout en bout.
 
 
