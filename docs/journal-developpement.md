@@ -88,4 +88,19 @@ Test : 20 tests frontend réussis, 0 échec.
 
 **Résultat :** L'historique des emprunts fonctionne de bout en bout.
 
+## BUG-08 — Gestion des retards d'emprunt
+
+**Fichiers :** `front/app.js`, `front/tests/app.test.js`.
+
+**Problème :** L'historique ne distinguait pas les emprunts en retard des emprunts en cours.
+
+**Correction :** Comparaison de `dueAt` avec la date actuelle pour afficher automatiquement le statut "En retard" si le jeu n'a pas été rendu.
+
+**Tests :**
+- Emprunt en retard : "En retard".
+- Emprunt actif : "En cours".
+- Emprunt rendu : "Rendu" (test BUG-07).
+- Frontend : 24 tests réussis, 0 échec.
+
+**Résultat :** Les retards sont détectés automatiquement, sans modification de l'API ni de la base de données.
 

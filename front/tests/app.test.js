@@ -191,3 +191,62 @@ test("loan history shows game, member, dates and return status", async () => {
   assertIncludes(history, "Retour prévu le 26 novembre 2026");
   assertIncludes(history, "Rendu le 12 novembre 2026");
 });
+
+// --- Gestion des retards ---------------------------------------------------
+
+// BUG-08 : Vérifier qu'un emprunt non rendu et dépassé affiche "En retard".
+test("an overdue loan shows En retard", async () => {
+  const loan = {
+    id: "l2",
+    gameID: "g1",
+    memberID: "m1",
+    borrowedAt: "2020-01-01T10:00:00Z",
+    dueAt: "2020-01-15T10:00:00Z",
+    returnedAt: null,
+  };
+
+  const app = await mountApp(
+    {
+      "GET /loans": [loan],
+      "GET /games": [catan],
+      "GET /members": [camille],
+    },
+    { hash: "#loans" },
+  );
+
+  await waitFor(
+    () => app.$$("#loans-list .row").length === 1,
+    "l'affichage de l'emprunt en retard",
+  );
+
+  const history = app.$("#loans-list").textContent;
+
+  assertIncludes(history, "Catan");
+  assertIncludes(history, "Camille");
+  assertIncludes(history, "En retard");
+});
+
+// BUG-08 : Vérifier qu'un emprunt non rendu reste "En cours".
+test("an active loan shows En cours", async () => {
+  const loan = {
+    id: "l3",
+    gameID: "g1",
+    memberID: "m1",
+    borrowedAt: "2099-01-01T10:00:00Z",
+    dueAt: "2099-01-15T10:00:00Z",
+    returnedAt: null,
+  };
+
+  const app = await mountApp(
+    {
+      "GET /loans": [loan],
+      "GET /games": [catan],
+      "GET /members": [camille],
+    },
+    { hash: "#loans" },
+  );
+
+  await waitFor(() => app.$$("#loans-list .row").length === 1);
+
+  assertIncludes(app.$("#loans-list").textContent, "En cours");
+});

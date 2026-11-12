@@ -231,7 +231,12 @@ async function loadLoans() {
       const game = games.find((g) => g.id === loan.gameID);
       const member = members.find((m) => m.id === loan.memberID);
 
-      const status = loan.returnedAt ? "Rendu" : "En cours";
+      // BUG-08 : Déterminer si un emprunt est rendu, en retard ou en cours.
+      const status = loan.returnedAt
+        ? "Rendu"
+        : new Date(loan.dueAt) < new Date()
+          ? "En retard"
+          : "En cours";
 
       return el(
         "li",
