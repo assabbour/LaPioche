@@ -32,7 +32,7 @@ const knownMessages = {
   "Invalid game id": "L'identifiant du jeu n'est pas valide.",
   "Invalid member id": "L'identifiant de l'adhérent·e n'est pas valide.",
   "Invalid loan id": "L'identifiant de l'emprunt n'est pas valide.",
-  "Game is already on loan": "Ce jeu est déjà emprunté : il faut d'abord le rendre.",
+  "Game already on loan": "Ce jeu est déjà emprunté : il faut d'abord le rendre.",
   "Loan is already returned": "Cet emprunt a déjà été rendu.",
   "A game with loans cannot be deleted":
     "Suppression impossible : ce jeu a un historique d'emprunts, conservé même quand le jeu est rendu.",

@@ -47,3 +47,13 @@
 **Test :** `testShowUnknownGameReturnsNotFound` — Réussi.
 
 **Commit :** `fix: return 404 for unknown games`
+
+## BUG-05 — Démarrage du frontend et tests JavaScript
+
+Fichiers : front/api.js, front/tests/api.test.js
+
+Problème : Le message d'erreur HTTP 409 renvoyé par l'API ne correspondait pas à celui attendu par le frontend.
+
+Correction : Harmonisation du message Game already on loan entre l'API, le frontend et les tests.
+
+Test : 20 tests frontend réussis, 0 échec.

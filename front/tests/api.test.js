@@ -5,7 +5,7 @@ import { fakeApi, withFakeFetch } from "./helpers.js";
 // --- translateError : les messages de l'API deviennent des phrases en français
 
 test("translateError translates a known message", () => {
-  assertEqual(translateError(409, "Game is already on loan"), "Ce jeu est déjà emprunté : il faut d'abord le rendre.");
+  assertEqual(translateError(409, "Game already on loan"), "Ce jeu est déjà emprunté : il faut d'abord le rendre.");
 });
 
 test("translateError translates each validation error separately", () => {
@@ -69,7 +69,7 @@ test("an unreachable server gives a clear message", async () => {
 });
 
 test("a game already on loan (409) gives a French message", async () => {
-  const { fetch } = fakeApi({ "POST /loans": [409, { error: true, reason: "Game is already on loan" }] });
+  const { fetch } = fakeApi({ "POST /loans": [409, { error: true, reason: "Game already on loan" }] });
   const error = await expectError(withFakeFetch(fetch, () => api.borrow("g1", "m1")));
   assertTrue(error instanceof ApiError, "l'erreur devrait être une ApiError");
   assertEqual(error.status, 409);
