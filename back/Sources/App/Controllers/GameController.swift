@@ -46,7 +46,8 @@ struct GameController: RouteCollection {
             .with(\.$loans)
             .first()
         else {
-            throw Abort(.internalServerError, reason: "Game not found")
+            // BUG-04 : Retourner HTTP 404 si le jeu n'existe pas.
+            throw Abort(.notFound, reason: "Game not found")
         }
         return game
     }

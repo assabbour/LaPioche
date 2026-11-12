@@ -35,3 +35,15 @@
 **Test :** `testBorrowingAGameAlreadyOnLoanReturnsConflict` — Réussi.
 
 **Commit :** `fix: prevent duplicate game loans`
+
+## BUG-04 — Jeu introuvable (HTTP 404)
+
+**Fichier :** `GameController.swift`
+
+**Problème :** Un jeu inexistant retournait `500` au lieu de `404`.
+
+**Correction :** J'ai remplacé `.internalServerError` par `.notFound`.
+
+**Test :** `testShowUnknownGameReturnsNotFound` — Réussi.
+
+**Commit :** `fix: return 404 for unknown games`
