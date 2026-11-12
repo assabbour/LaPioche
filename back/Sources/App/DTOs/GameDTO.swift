@@ -20,7 +20,7 @@ extension Game {
             maxPlayers: maxPlayers,
             durationMinutes: durationMinutes,
             isAvailable: isAvailable,
-            // BUG-06 : Transmettre l'ID de l'emprunt non rendu au frontend.
+            // FEAT-03 : Transmettre l'ID de l'emprunt non rendu au frontend.
             activeLoanID: $loans.value?.first(where: { $0.returnedAt == nil })?.id
         )
     }

@@ -90,7 +90,7 @@ test("borrowing without any member explains that one must be added first", async
   assertTrue(!app.$("#borrow-dialog").open, "la boîte d'emprunt ne doit pas s'ouvrir");
 });
 
-// BUG-06 : Rendre un jeu emprunté et vérifier sa disponibilité.
+// FEAT-03 : Rendre un jeu emprunté et vérifier sa disponibilité.
 test("returning a game makes it available again", async () => {
   const borrowedGame = { ...dixit, activeLoanID: "l1" };
 
@@ -158,7 +158,7 @@ test("an email already in use is shown in French", async () => {
 
 // --- Historique des emprunts -----------------------------------------------
 
-// BUG-07 : Vérifier l'affichage de l'historique des emprunts.
+// EXTRA-01 : Vérifier l'affichage de l'historique des emprunts.
 test("loan history shows game, member, dates and return status", async () => {
   const loan = {
     id: "l1",
@@ -194,7 +194,7 @@ test("loan history shows game, member, dates and return status", async () => {
 
 // --- Gestion des retards ---------------------------------------------------
 
-// BUG-08 : Vérifier qu'un emprunt non rendu et dépassé affiche "En retard".
+// FEAT-05 : Vérifier qu'un emprunt non rendu et dépassé affiche "En retard".
 test("an overdue loan shows En retard", async () => {
   const loan = {
     id: "l2",
@@ -226,7 +226,7 @@ test("an overdue loan shows En retard", async () => {
   assertIncludes(history, "En retard");
 });
 
-// BUG-08 : Vérifier qu'un emprunt non rendu reste "En cours".
+// FEAT-05 : Vérifier qu'un emprunt non rendu reste "En cours".
 test("an active loan shows En cours", async () => {
   const loan = {
     id: "l3",

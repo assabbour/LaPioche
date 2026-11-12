@@ -5,13 +5,13 @@ struct LoanController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
         let loans = routes.grouped("loans")
         loans.post(use: create)
-        // BUG-06 : Ajouter la route permettant de rendre un jeu emprunté.
+        // FEAT-03 : Ajouter la route permettant de rendre un jeu emprunté.
         loans.post(":loanID", "return", use: returnGame)
-        // BUG-07 : Consulter l'historique des emprunts.
+        // EXTRA-01 : Consulter l'historique des emprunts.
         loans.get(use: index)
     }
 
-    // BUG-07 : Récupérer tous les emprunts, du plus récent au plus ancien.
+    // EXTRA-01 : Récupérer tous les emprunts, du plus récent au plus ancien.
     @Sendable
     func index(req: Request) async throws -> [LoanDTO] {
         let loans = try await Loan.query(on: req.db)
@@ -52,7 +52,8 @@ struct LoanController: RouteCollection {
         try await loan.save(on: req.db)
         return try await loan.toDTO().encodeResponse(status: .created, for: req)
     }
-    // BUG-06 : Enregistrer le retour d'un jeu et le rendre disponible.
+
+    // FEAT-03 : Enregistrer le retour d'un jeu et le rendre disponible.
     @Sendable
     func returnGame(req: Request) async throws -> LoanDTO {
         guard let loanID = req.parameters.get("loanID", as: UUID.self) else {

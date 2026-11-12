@@ -69,7 +69,7 @@ function bindSubmit(dialog, form, handler) {
 
 // --- Onglets ---------------------------------------------------------------
 
-// BUG-07 : Ajouter l'onglet Historique.
+// EXTRA-01 : Ajouter l'onglet Historique.
 const tabs = ["games", "members", "loans"];
 
 function currentTab() {
@@ -117,7 +117,7 @@ function gameCard(game) {
   if (game.isAvailable) {
     actions.append(button("Emprunter", () => openBorrowDialog(game), "primary"));
   } else if (game.activeLoanID) {
-    // BUG-06 : Afficher le bouton Rendre pour un jeu emprunté.
+    // FEAT-03 : Afficher le bouton Rendre pour un jeu emprunté.
     actions.append(button("Rendre", () => returnGame(game), "primary"));
   }
 
@@ -150,7 +150,7 @@ bindSubmit(gameDialog, gameForm, (data) =>
 
 // --- Emprunts --------------------------------------------------------------
 
-// BUG-06 : Enregistrer le retour du jeu et actualiser la liste.
+// FEAT-03 : Enregistrer le retour du jeu et actualiser la liste.
 async function returnGame(game) {
   await run(async () => {
     await api.returnLoan(game.activeLoanID);
@@ -216,7 +216,7 @@ bindSubmit(memberDialog, memberForm, (data) =>
 
 // --- Historique des emprunts -----------------------------------------------
 
-// BUG-07 : Charger les emprunts et retrouver les noms des jeux et adhérent·es.
+// EXTRA-01 : Charger les emprunts et retrouver les noms des jeux et adhérent·es.
 async function loadLoans() {
   const [loans, games, members] = await Promise.all([
     api.listLoans(),
@@ -231,7 +231,7 @@ async function loadLoans() {
       const game = games.find((g) => g.id === loan.gameID);
       const member = members.find((m) => m.id === loan.memberID);
 
-      // BUG-08 : Déterminer si un emprunt est rendu, en retard ou en cours.
+      // FEAT-05 : Déterminer si un emprunt est rendu, en retard ou en cours.
       const status = loan.returnedAt
         ? "Rendu"
         : new Date(loan.dueAt) < new Date()

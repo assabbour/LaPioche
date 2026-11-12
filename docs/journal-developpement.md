@@ -1,106 +1,167 @@
 # Journal de développement — La Pioche
 
-## BUG-01 — Création d'un jeu (HTTP 201)
+## Suivi du backlog officiel
+
+| Ticket | Fonctionnalité | Statut |
+|---|---|---|
+| BUG-01 | Création d'un jeu — HTTP 201 | Terminé |
+| BUG-02 | Durée d'emprunt — 14 jours | Terminé |
+| BUG-03 | Empêcher le double emprunt | Terminé |
+| BUG-04 | Jeu introuvable — HTTP 404 | Terminé |
+| FEAT-01 | Modifier et supprimer un jeu | À faire |
+| FEAT-02 | Modifier et supprimer un adhérent | À faire |
+| FEAT-03 | Rendre un jeu | Développé — critères à vérifier |
+| FEAT-04 | Consulter les emprunts d'un adhérent | À faire |
+| FEAT-05 | Consulter les emprunts en retard | Partiellement développé |
+| FEAT-06 | Rechercher un jeu | À faire |
+| FEAT-07 | Filtrer les jeux disponibles | À faire |
+| BONUS-01 | Authentification JWT | Facultatif |
+| BONUS-02 | Intégration Bootstrap 5 | Facultatif |
+
+## Corrections des anomalies officielles
+
+### BUG-01 — Création d'un jeu (HTTP 201)
 
 **Fichier :** `GameController.swift`
 
 **Problème :** La création d'un jeu retournait `200 OK` au lieu de `201 Created`.
 
-**Correction :** J'ai modifié `create()` pour retourner le bon statut HTTP.
+**Correction :** Modification de `create()` pour retourner le bon statut HTTP.
 
 **Test :** `testCreateGameReturnsCreated` — Réussi.
 
 **Commit :** `fix: return 201 when creating a game`
 
-## BUG-02 — Durée d'emprunt (14 jours)
+### BUG-02 — Durée d'emprunt (14 jours)
 
 **Fichier :** `Loan.swift`
 
 **Problème :** La durée d'emprunt était de 13 jours au lieu de 14.
 
-**Correction :** J'ai modifié la constante `durationInDays` de 13 à 14.
+**Correction :** Modification de la constante `durationInDays` de 13 à 14.
 
 **Test :** `testDueDateIsFourteenDaysAfterBorrowDate` — Réussi.
 
 **Commit :** `fix: set loan duration to 14 days`
 
-## BUG-03 — Empêcher le double emprunt
+### BUG-03 — Empêcher le double emprunt
 
 **Fichier :** `LoanController.swift`
 
 **Problème :** Un jeu déjà emprunté pouvait être emprunté une deuxième fois.
 
-**Correction :** J'ai ajouté une vérification des emprunts actifs avant de créer un nouvel emprunt. Si le jeu n'est pas rendu, l'API retourne `409 Conflict`.
+**Correction :** Vérification des emprunts actifs avant de créer un nouvel emprunt. Si le jeu n'est pas rendu, l'API retourne `409 Conflict`.
 
 **Test :** `testBorrowingAGameAlreadyOnLoanReturnsConflict` — Réussi.
 
 **Commit :** `fix: prevent duplicate game loans`
 
-## BUG-04 — Jeu introuvable (HTTP 404)
+### BUG-04 — Jeu introuvable (HTTP 404)
 
 **Fichier :** `GameController.swift`
 
 **Problème :** Un jeu inexistant retournait `500` au lieu de `404`.
 
-**Correction :** J'ai remplacé `.internalServerError` par `.notFound`.
+**Correction :** Remplacement de `.internalServerError` par `.notFound`.
 
 **Test :** `testShowUnknownGameReturnsNotFound` — Réussi.
 
 **Commit :** `fix: return 404 for unknown games`
 
-## BUG-05 — Démarrage du frontend et tests JavaScript
+## Fonctionnalités officielles développées
 
-Fichiers : front/api.js, front/tests/api.test.js
+### FEAT-03 — Retour d'un jeu emprunté
 
-Problème : Le message d'erreur HTTP 409 renvoyé par l'API ne correspondait pas à celui attendu par le frontend.
-
-Correction : Harmonisation du message Game already on loan entre l'API, le frontend et les tests.
-
-Test : 20 tests frontend réussis, 0 échec.
-
-## BUG-06 — Retour d'un jeu emprunté
+*Ancienne référence interne : BUG-06*
 
 **Fichiers :** `LoanController.swift`, `GameDTO.swift`, `LoanTests.swift`, `front/api.js`, `front/app.js`, `front/tests/app.test.js`.
 
-**Problème :** Un jeu emprunté restait indisponible sans possibilité de le rendre depuis l'interface.
+**Besoin :** Permettre de rendre un jeu emprunté et de le rendre à nouveau disponible.
 
-**Correction :** Ajout de la route `POST /loans/{loanID}/return`, du champ `activeLoanID` dans `GameDTO` et du bouton **Rendre** dans le frontend. Après le retour, le jeu redevient disponible et peut être emprunté à nouveau.
-
-**Tests :**
-- Backend : `testReturnedGameBecomesAvailable` — 20 tests réussis, 0 échec.
-- Frontend : `returning a game makes it available again` — 21 tests réussis, 0 échec.
-- Validation manuelle : bouton **Rendre** → **Disponible** → **Emprunter**.
-
-**Résultat :** Le retour d'un jeu fonctionne de bout en bout. Le BUG-06 est fusionné dans `main` et synchronisé sur GitHub (commit `0752fd6`).
-
-## BUG-07 — Historique des emprunts
-
-**Fichiers :** `LoanController.swift`, `LoanTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`, `front/tests/app.test.js`.
-
-**Problème :** L'application ne permettait pas de consulter l'historique des emprunts.
-
-**Correction :** Ajout de la route `GET /loans` et d'un onglet **Historique** affichant le jeu, l'adhérent, les dates d'emprunt et de retour, ainsi que l'état de l'emprunt.
+**Développement :**
+- Ajout de `POST /loans/:id/return`.
+- Ajout du champ `activeLoanID` dans `GameDTO`.
+- Ajout du bouton « Rendre » dans le frontend.
+- Actualisation de la disponibilité après le retour.
 
 **Tests :**
-- Backend : `testLoanHistoryReturnsNewestFirst` — 21 tests réussis, 0 échec.
-- Frontend : `loan history shows game, member, dates and return status` — 22 tests réussis, 0 échec.
-- Validation manuelle : affichage d'un emprunt rendu depuis l'interface.
+- Backend : `testReturnedGameBecomesAvailable` — 20 tests réussis.
+- Frontend : `returning a game makes it available again` — 21 tests réussis.
+- Validation manuelle : Rendre → Disponible → Emprunter.
 
-**Résultat :** L'historique des emprunts fonctionne de bout en bout.
+**Commit :** `0752fd6` — Fusionné dans `main`.
 
-## BUG-08 — Gestion des retards d'emprunt
+**Statut :** Fonctionnalité développée. Vérifier la couverture des erreurs `404`, `409` et du refus affiché en français.
+
+### FEAT-05 — Emprunts en retard
+
+*Ancienne référence interne : BUG-08*
 
 **Fichiers :** `front/app.js`, `front/tests/app.test.js`.
 
-**Problème :** L'historique ne distinguait pas les emprunts en retard des emprunts en cours.
+**Besoin :** Identifier les emprunts non rendus dont la date limite est dépassée.
 
-**Correction :** Comparaison de `dueAt` avec la date actuelle pour afficher automatiquement le statut "En retard" si le jeu n'a pas été rendu.
+**Développement réalisé :**
+- Comparaison de `dueAt` avec la date actuelle.
+- Affichage des états « En cours », « En retard » et « Rendu » dans l'historique.
 
 **Tests :**
-- Emprunt en retard : "En retard".
-- Emprunt actif : "En cours".
-- Emprunt rendu : "Rendu" (test BUG-07).
-- Frontend : 24 tests réussis, 0 échec.
+- Emprunt en retard : « En retard ».
+- Emprunt actif : « En cours ».
+- Emprunt rendu : « Rendu ».
+- 24 tests frontend réussis.
 
-**Résultat :** Les retards sont détectés automatiquement, sans modification de l'API ni de la base de données.
+**Travail restant pour respecter le backlog :**
+- Backend : créer `GET /loans/overdue`.
+- Frontend : ajouter une vue dédiée aux retards.
+- Afficher le nombre de jours de retard.
+- Ajouter un compteur visible sans ouvrir la vue.
+- Prévoir un message lorsque la liste est vide.
+- Ajouter les tests correspondants.
 
+**Statut :** Partiellement développé.
+
+## Travaux supplémentaires
+
+### TECH-01 — Démarrage du frontend et tests JavaScript
+
+*Ancienne référence interne : BUG-05*
+
+**Fichiers :** `front/api.js`, `front/tests/api.test.js`.
+
+**Problème :** Le message HTTP `409` renvoyé par l'API ne correspondait pas à celui attendu par le frontend.
+
+**Correction :** Harmonisation du message `Game already on loan` entre l'API, le frontend et les tests.
+
+**Tests :** 20 tests frontend réussis, 0 échec.
+
+### EXTRA-01 — Historique général des emprunts
+
+*Ancienne référence interne : BUG-07*
+
+**Fichiers :** `LoanController.swift`, `LoanTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`, `front/tests/app.test.js`.
+
+**Besoin :** Permettre de consulter l'historique général des emprunts.
+
+**Développement :**
+- Ajout de `GET /loans`.
+- Ajout de l'onglet « Historique ».
+- Affichage du jeu, de l'adhérent, des dates et de l'état de l'emprunt.
+
+**Tests :**
+- Backend : `testLoanHistoryReturnsNewestFirst` — 21 tests réussis.
+- Frontend : `loan history shows game, member, dates and return status` — 22 tests réussis.
+- Validation manuelle : consultation d'un emprunt rendu.
+
+**Statut :** Développé.
+
+**Remarque :** Cette fonctionnalité supplémentaire ne remplace pas FEAT-04, qui demande une consultation des emprunts depuis chaque adhérent.
+
+## Conventions de développement
+
+- Utiliser les références officielles `BUG-01` à `BUG-04` et `FEAT-01` à `FEAT-07`.
+- Utiliser `TECH` pour les corrections techniques supplémentaires et `EXTRA` pour les fonctionnalités hors backlog.
+- Conserver les anciens commits Git.
+- Développer les fonctionnalités restantes dans l'ordre du backlog.
+- Ajouter les tests dans le même commit que le code.
+- Vérifier les tests backend et frontend avant chaque push.

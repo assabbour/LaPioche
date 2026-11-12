@@ -95,7 +95,7 @@ final class LoanTests: XCTestCase {
         }
     }
 
-    // BUG-06 : Vérifier qu'un jeu redevient disponible après son retour.
+    // FEAT-03 : Vérifier qu'un jeu redevient disponible après son retour.
     func testReturnedGameBecomesAvailable() async throws {
         try await withApp { app in
             let game = try await createGame(app)
@@ -129,7 +129,7 @@ final class LoanTests: XCTestCase {
         }
     }
 
-    // BUG-07 : Vérifier que l'historique contient les emprunts du plus récent au plus ancien.
+    // EXTRA-01 : Vérifier que l'historique contient les emprunts du plus récent au plus ancien.
     func testLoanHistoryReturnsNewestFirst() async throws {
         try await withApp { app in
             let game1 = try await createGame(app)
