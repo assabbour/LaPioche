@@ -17,6 +17,7 @@ struct GameController: RouteCollection {
         return games.map { $0.toDTO() }
     }
 
+    // BUG-01 : Retourner HTTP 201 Created au lieu de 200 OK après la création d'un jeu.
     @Sendable
     func create(req: Request) async throws -> Response {
         try CreateGameDTO.validate(content: req)
@@ -25,7 +26,10 @@ struct GameController: RouteCollection {
 
         let game = dto.toModel()
         try await game.save(on: req.db)
-        return try await game.toDTO().encodeResponse(for: req)
+
+        let response = try await game.toDTO().encodeResponse(for: req)
+        response.status = .created
+        return response
     }
 
     @Sendable
