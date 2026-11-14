@@ -235,3 +235,22 @@ BONUS-02	Intégration Bootstrap 5	Facultatif
 - Vérification du fonctionnement avec la recherche par titre.
 
 **Statut :** Terminé.
+
+## BONUS-02 — Intégration de Bootstrap 5
+
+**Statut : Terminé**
+
+### Modifications
+- Intégration de Bootstrap 5 via CDN.
+- Harmonisation des boutons et des formulaires.
+- Adaptation des couleurs au thème clair/sombre.
+- Conservation du CSS personnalisé et du JavaScript Vanilla.
+
+### Fichiers modifiés
+- `front/index.html`
+- `front/style.css`
+- `front/app.js`
+
+### Tests
+- Vérification visuelle des interfaces.
+- Tests frontend : 2/2 réussis.

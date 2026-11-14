@@ -110,7 +110,6 @@ label.check input { width: auto; margin: 0; }
   border-radius: 8px;
   padding: 12px;
 }
-.card { display: flex; flex-direction: column; gap: 8px; }
 .card-head { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
 .meta { margin: 0; color: var(--muted); font-size: 0.9rem; }
 
@@ -153,6 +152,76 @@ dialog:not([open]) { display: none; }
 .toast.error { background: var(--late); color: var(--bg); }
 
 /* FEAT-06 : Espacement entre la recherche et les cartes. */
+
 #games-list {
   margin-top: 20px;
+}
+
+/* BONUS-02 : Compatibilité Bootstrap avec notre thème */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.card button {
+  color: var(--text);
+}
+
+/* BONUS-02 : Personnaliser la couleur principale Bootstrap */
+.btn-primary {
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-color: var(--accent-text);
+  --bs-btn-hover-bg: var(--accent);
+  --bs-btn-hover-border-color: var(--accent);
+  --bs-btn-hover-color: var(--accent-text);
+}
+
+/* Champ de recherche */
+#search-games {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border);
+}
+
+#search-games::placeholder {
+  color: var(--muted) !important;
+  opacity: 1;
+}
+
+/* BONUS-02 : Même apparence pour tous les champs Bootstrap */
+.form-control,
+.form-control:focus {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(127 195 172 / 20%);
+}
+
+/* BONUS-02 : Menu déroulant Bootstrap */
+.form-select,
+.form-select:focus {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(127 195 172 / 20%);
+}
+
+/* BONUS-02 : Flèche Bootstrap adaptée au thème */
+@media (prefers-color-scheme: dark) {
+  .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23eceff4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
 }

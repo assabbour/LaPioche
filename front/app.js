@@ -21,8 +21,17 @@ function el(tag, props = {}, ...children) {
   return node;
 }
 
+// BONUS-02 : Boutons Bootstrap 5
 function button(label, onClick, className = "") {
-  return el("button", { type: "button", class: className, onclick: onClick }, label);
+  const bootstrapClass = className === "primary"
+    ? "btn btn-primary"
+    : "btn btn-outline-secondary";
+
+  return el("button", {
+    type: "button",
+    class: bootstrapClass,
+    onclick: onClick
+  }, label);
 }
 
 function toast(message, isError = false) {
