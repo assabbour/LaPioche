@@ -73,10 +73,21 @@ function bindSubmit(dialog, form, handler) {
 const tabs = ["games", "members", "loans"];
 // FEAT-04 : Adhérent sélectionné pour consulter ses emprunts.
 let selectedMember = null;
+// FEAT-05 : Activer ou désactiver le filtre des retards.
+let showOverdue = false;
 
 function currentTab() {
   const name = location.hash.slice(1);
   return tabs.includes(name) ? name : "games";
+}
+
+// FEAT-05 : Actualiser le compteur des emprunts en retard.
+async function updateOverdueCount() {
+  const loans = await api.listOverdueLoans();
+  const counter = $("#overdue-count");
+
+  counter.textContent = `(${loans.length})`;
+  counter.hidden = loans.length === 0;
 }
 
 async function refresh() {
@@ -84,6 +95,7 @@ async function refresh() {
   // L'onglet Historique affiche toujours tous les emprunts par défaut.
   if (tab !== "loans") {
     selectedMember = null;
+    showOverdue = false;
   }
   for (const name of tabs) {
     $(`#${name}`).hidden = name !== tab;
@@ -94,6 +106,7 @@ async function refresh() {
     members: loadMembers,
     loans: loadLoans,
   };
+  await run(updateOverdueCount);
   await run(loaders[tab]);
 }
 
@@ -328,25 +341,42 @@ async function loadLoans() {
   const [loans, games, members] = await Promise.all([
     selectedMember
       ? api.listMemberLoans(selectedMember.id)
-      : api.listLoans(),
+      : showOverdue
+        ? api.listOverdueLoans()
+        : api.listLoans(),
     api.listGames(),
     api.listMembers(),
   ]);
   $("#loans-title").textContent = selectedMember
     ? `Emprunts de ${selectedMember.name}`
-    : "Historique des emprunts";
-  $("#all-loans").hidden = !selectedMember;
+    : showOverdue
+      ? "Emprunts en retard"
+      : "Historique des emprunts";
+
+  $("#overdue-loans").hidden = !!selectedMember || showOverdue;
+  $("#all-loans").hidden = !selectedMember && !showOverdue;
+  // FEAT-05 : Adapter le message selon le filtre actif.
+  $("#loans-empty").textContent = showOverdue
+    ? "Aucun emprunt en retard."
+    : selectedMember
+      ? "Aucun emprunt pour cet adhérent."
+      : "Aucun emprunt enregistré pour le moment.";
   $("#loans-empty").hidden = loans.length > 0;
   $("#loans-list").replaceChildren(
     ...loans.map((loan) => {
       const game = games.find((g) => g.id === loan.gameID);
       const member = members.find((m) => m.id === loan.memberID);
 
-      // FEAT-05 : Déterminer si un emprunt est rendu, en retard ou en cours.
+      // FEAT-05 : Calculer le retard d'un emprunt non rendu.
+      const daysLate = loan.returnedAt
+        ? 0
+        : Math.max(0, Math.ceil(
+            (Date.now() - new Date(loan.dueAt).getTime()) / 86_400_000
+          ));
       const status = loan.returnedAt
         ? "Rendu"
-        : new Date(loan.dueAt) < new Date()
-          ? "En retard"
+        : daysLate > 0
+          ? `En retard de ${daysLate} jour${daysLate > 1 ? "s" : ""}`
           : "En cours";
 
       return el(
@@ -375,6 +405,13 @@ async function loadLoans() {
 // FEAT-04 : Revenir à l'historique global.
 $("#all-loans").addEventListener("click", () => {
   selectedMember = null;
+  showOverdue = false;
+  refresh();
+});
+
+// FEAT-05 : Afficher uniquement les emprunts en retard.
+$("#overdue-loans").addEventListener("click", () => {
+  showOverdue = true;
   refresh();
 });
 

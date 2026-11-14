@@ -9,6 +9,8 @@ struct LoanController: RouteCollection {
         loans.post(":loanID", "return", use: returnGame)
         // EXTRA-01 : Consulter l'historique des emprunts.
         loans.get(use: index)
+        // FEAT-05 : Consulter les emprunts en retard.
+        loans.get("overdue", use: overdue)
     }
 
     // EXTRA-01 : Récupérer tous les emprunts, du plus récent au plus ancien.
@@ -16,6 +18,18 @@ struct LoanController: RouteCollection {
     func index(req: Request) async throws -> [LoanDTO] {
         let loans = try await Loan.query(on: req.db)
             .sort(\.$borrowedAt, .descending)
+            .all()
+
+        return loans.map { $0.toDTO() }
+    }
+
+    // FEAT-05 : Récupérer les emprunts non rendus dont la date limite est dépassée.
+    @Sendable
+    func overdue(req: Request) async throws -> [LoanDTO] {
+        let loans = try await Loan.query(on: req.db)
+            .filter(\.$returnedAt == nil)
+            .filter(\.$dueAt < Date())
+            .sort(\.$dueAt, .ascending)
             .all()
 
         return loans.map { $0.toDTO() }

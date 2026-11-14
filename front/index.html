@@ -12,7 +12,10 @@
     <nav aria-label="Sections">
       <a href="#games" data-tab="games">Jeux</a>
       <a href="#members" data-tab="members">Adhérent·es</a>
-      <a href="#loans" data-tab="loans">Historique</a>
+      <!-- FEAT-05 : Compteur des emprunts en retard. -->
+      <a href="#loans" data-tab="loans">
+        Historique <span id="overdue-count" hidden></span>
+      </a>
     </nav>
     <a class="docs-link" id="docs-link" href="http://localhost:8081/">Documentation API</a>
   </header>
@@ -39,9 +42,15 @@
     <section id="loans" class="tab" hidden>
       <div class="section-head">
         <h2 id="loans-title">Historique des emprunts</h2>
-        <button id="all-loans" type="button" hidden>
-          Tous les emprunts
-        </button>
+        <!-- FEAT-05 : Filtrer les emprunts en retard. -->
+        <div class="actions">
+          <button id="overdue-loans" type="button">
+            Emprunts en retard
+          </button>
+          <button id="all-loans" type="button" hidden>
+            Tous les emprunts
+          </button>
+        </div>
       </div>
       <p id="loans-empty" class="empty" hidden>
         Aucun emprunt enregistré pour le moment.

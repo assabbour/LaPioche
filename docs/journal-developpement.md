@@ -9,9 +9,9 @@
 | BUG-03 | Empêcher le double emprunt | Terminé |
 | BUG-04 | Jeu introuvable — HTTP 404 | Terminé |
 | FEAT-01 | Modifier et supprimer un jeu | Terminé |
-| FEAT-02 | Modifier et supprimer un adhérent | Développé — tests frontend à vérifier |
-| FEAT-03 | Rendre un jeu | Développé — critères à vérifier |
-| FEAT-04 | Consulter les emprunts d'un adhérent | À faire |
+| FEAT-02 | Modifier et supprimer un adhérent | Terminé |
+| FEAT-03 | Rendre un jeu | Terminé |
+| FEAT-04 | Consulter les emprunts d'un adhérent | Terminé |
 | FEAT-05 | Consulter les emprunts en retard | Partiellement développé |
 | FEAT-06 | Rechercher un jeu | À faire |
 | FEAT-07 | Filtrer les jeux disponibles | À faire |
@@ -161,76 +161,32 @@
 
 **Statut :** Terminé.
 
-
-### FEAT-05 — Emprunts en retard
+## FEAT-05 — Emprunts en retard
 
 *Ancienne référence interne : BUG-08*
 
-**Fichiers :** `front/app.js`, `front/tests/app.test.js`.
+**Fichiers :** `back/Sources/App/Controllers/LoanController.swift`, `back/Tests/AppTests/LoanTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`.
 
 **Besoin :** Identifier les emprunts non rendus dont la date limite est dépassée.
 
 **Développement réalisé :**
-- Comparaison de `dueAt` avec la date actuelle.
-- Affichage des états « En cours », « En retard » et « Rendu » dans l'historique.
+- Création de la route `GET /loans/overdue`.
+- Filtrage des emprunts non rendus dont la date limite est dépassée.
+- Tri des emprunts en retard par date limite croissante.
+- Ajout du bouton « Emprunts en retard » dans l'historique.
+- Affichage du nombre de jours de retard.
+- Ajout du compteur « Historique (N) » dans la navigation.
+- Conservation des états « En cours », « En retard » et « Rendu ».
+- Ajout du bouton « Tous les emprunts » pour revenir à l'historique complet.
+- Affichage du message « Aucun emprunt en retard » lorsque la liste est vide.
 
 **Tests :**
-- Emprunt en retard : « En retard ».
-- Emprunt actif : « En cours ».
-- Emprunt rendu : « Rendu ».
-- 24 tests frontend réussis.
+- Backend : 32 tests réussis, 0 échec.
+- Frontend : 2 fichiers de tests réussis, 0 échec.
+- Vérification manuelle du compteur et du nombre de jours de retard.
+- Vérification du filtre avec un emprunt réellement en retard.
+- Vérification de l'exclusion des emprunts déjà rendus.
+- Vérification de l'affichage lorsque la liste des retards est vide.
 
-**Travail restant pour respecter le backlog :**
-- Backend : créer `GET /loans/overdue`.
-- Frontend : ajouter une vue dédiée aux retards.
-- Afficher le nombre de jours de retard.
-- Ajouter un compteur visible sans ouvrir la vue.
-- Prévoir un message lorsque la liste est vide.
-- Ajouter les tests correspondants.
+**Statut :** Terminé.
 
-**Statut :** Partiellement développé.
-
-## Travaux supplémentaires
-
-### TECH-01 — Démarrage du frontend et tests JavaScript
-
-*Ancienne référence interne : BUG-05*
-
-**Fichiers :** `front/api.js`, `front/tests/api.test.js`.
-
-**Problème :** Le message HTTP `409` renvoyé par l'API ne correspondait pas à celui attendu par le frontend.
-
-**Correction :** Harmonisation du message `Game already on loan` entre l'API, le frontend et les tests.
-
-**Tests :** 20 tests frontend réussis, 0 échec.
-
-### EXTRA-01 — Historique général des emprunts
-
-*Ancienne référence interne : BUG-07*
-
-**Fichiers :** `LoanController.swift`, `LoanTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`, `front/tests/app.test.js`.
-
-**Besoin :** Permettre de consulter l'historique général des emprunts.
-
-**Développement :**
-- Ajout de `GET /loans`.
-- Ajout de l'onglet « Historique ».
-- Affichage du jeu, de l'adhérent, des dates et de l'état de l'emprunt.
-
-**Tests :**
-- Backend : `testLoanHistoryReturnsNewestFirst` — 21 tests réussis.
-- Frontend : `loan history shows game, member, dates and return status` — 22 tests réussis.
-- Validation manuelle : consultation d'un emprunt rendu.
-
-**Statut :** Développé.
-
-**Remarque :** Cette fonctionnalité supplémentaire ne remplace pas FEAT-04, qui demande une consultation des emprunts depuis chaque adhérent.
-
-## Conventions de développement
-
-- Utiliser les références officielles `BUG-01` à `BUG-04` et `FEAT-01` à `FEAT-07`.
-- Utiliser `TECH` pour les corrections techniques supplémentaires et `EXTRA` pour les fonctionnalités hors backlog.
-- Conserver les anciens commits Git.
-- Développer les fonctionnalités restantes dans l'ordre du backlog.
-- Ajouter les tests dans le même commit que le code.
-- Vérifier les tests backend et frontend avant chaque push.

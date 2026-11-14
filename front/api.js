@@ -125,4 +125,6 @@ export const api = {
   listLoans: () => request("GET", "/loans"),
   borrow: (gameID, memberID) => request("POST", "/loans", { gameID, memberID }),
   returnLoan: (loanID) => request("POST", `/loans/${loanID}/return`),
+  // FEAT-05 : Récupérer uniquement les emprunts en retard.
+  listOverdueLoans: () => request("GET", "/loans/overdue"),
 };

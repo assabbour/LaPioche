@@ -164,4 +164,42 @@ final class LoanTests: XCTestCase {
             }
         }
     }
+
+    // FEAT-05 : Vérifier que seuls les emprunts en retard et non rendus sont retournés.
+    func testOverdueLoans() async throws {
+        try await withApp { app in
+            let game1 = try await createGame(app)
+            let game2 = try await createGame(app)
+            let game3 = try await createGame(app)
+            let member = try await createMember(app)
+            let memberID = try XCTUnwrap(member.id)
+            for game in [game1, game2, game3] {
+                try await borrow(
+                    app,
+                    gameID: try XCTUnwrap(game.id),
+                    memberID: memberID
+                ) { _ in }
+            }
+            let loans = try await Loan.query(on: app.db).all()
+            for loan in loans {
+                if loan.$game.id == game1.id {
+                    loan.dueAt = Date().addingTimeInterval(-86_400)
+                } else if loan.$game.id == game2.id {
+                    loan.dueAt = Date().addingTimeInterval(86_400)
+                } else {
+                    loan.dueAt = Date().addingTimeInterval(-86_400)
+                    loan.returnedAt = Date()
+                }
+                try await loan.save(on: app.db)
+            }
+            try await app.test(.GET, "loans/overdue") { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                let overdue = try res.content.decode([LoanDTO].self)
+                XCTAssertEqual(overdue.count, 1)
+                XCTAssertEqual(overdue[0].gameID, game1.id)
+                XCTAssertNil(overdue[0].returnedAt)
+            }
+        }
+    }
+
 }
