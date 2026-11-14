@@ -65,6 +65,23 @@ test("a validation error is shown in French and the dialog stays open", async ()
   assertTrue(app.$("#game-dialog").open, "la boîte devrait rester ouverte");
 });
 
+// FEAT-07 : Afficher uniquement les jeux disponibles.
+test("available-only filter hides borrowed games", async () => {
+  const app = await mountApp({
+    "GET /games": [catan, dixit],
+  });
+  await waitFor(() => app.$$("#games-list .card").length === 2);
+  const checkbox = app.$("#available-only");
+  checkbox.checked = true;
+  checkbox.dispatchEvent(new Event("change"));
+  await waitFor(() => app.$$("#games-list .card").length === 1);
+  assertTrue(!!cardOf(app, "Catan"));
+  assertTrue(!cardOf(app, "Dixit"));
+  checkbox.checked = false;
+  checkbox.dispatchEvent(new Event("change"));
+  await waitFor(() => app.$$("#games-list .card").length === 2);
+});
+
 // --- Emprunts
 
 test("borrowing a game sends the game and the chosen member", async () => {

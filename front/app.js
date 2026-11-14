@@ -114,19 +114,30 @@ window.addEventListener("hashchange", refresh);
 
 // --- Jeux ------------------------------------------------------------------
 
-// FEAT-06 : Rechercher les jeux par titre.
 async function loadGames() {
   const search = $("#search-games").value.trim();
+  const availableOnly = $("#available-only").checked;
   const games = await api.listGames(search);
-  $("#games-empty").textContent = search
-    ? "Aucun jeu ne correspond à votre recherche."
-    : "La ludothèque ne contient aucun jeu pour le moment. Cliquez sur « Ajouter un jeu » pour créer le premier.";
-  $("#games-empty").hidden = games.length > 0;
-  $("#games-list").replaceChildren(...games.map(gameCard));
+  // FEAT-07 : Garder uniquement les jeux disponibles si la case est cochée.
+  const filteredGames = availableOnly
+    ? games.filter(game => game.isAvailable)
+    : games;
+  $("#games-empty").textContent = availableOnly
+    ? "Aucun jeu disponible ne correspond à vos critères."
+    : search
+      ? "Aucun jeu ne correspond à votre recherche."
+      : "La ludothèque ne contient aucun jeu pour le moment. Cliquez sur « Ajouter un jeu » pour créer le premier.";
+  $("#games-empty").hidden = filteredGames.length > 0;
+  $("#games-list").replaceChildren(...filteredGames.map(gameCard));
 }
 
 // FEAT-06 : Relancer la recherche à chaque saisie.
 $("#search-games").addEventListener("input", () => {
+  run(loadGames);
+});
+
+// FEAT-07 : Actualiser la liste lorsque le filtre change.
+$("#available-only").addEventListener("change", () => {
   run(loadGames);
 });
 

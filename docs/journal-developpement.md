@@ -212,3 +212,26 @@ BONUS-02	Intégration Bootstrap 5	Facultatif
 - Vérification de l'affichage et de l'espacement dans Safari.
 
 **Statut :** Développement terminé, validation finale avant commit.
+
+## FEAT-07 — Filtrer les jeux disponibles
+
+**Fichiers :** `front/index.html`, `front/app.js`, `front/tests/app.test.js`.
+
+**Besoin :** Afficher uniquement les jeux disponibles à l'emprunt.
+
+**Développement réalisé :**
+
+- Ajout de la case « Jeux disponibles uniquement ».
+- Filtrage des jeux avec `isAvailable`.
+- Conservation de la recherche par titre FEAT-06.
+- Actualisation automatique de la liste.
+- Affichage d'un message lorsqu'aucun jeu disponible ne correspond aux critères.
+
+**Tests :**
+
+- Frontend : 2 fichiers de tests réussis, 0 échec.
+- Test automatisé du filtre activé et désactivé.
+- Validation manuelle avec un jeu disponible et un jeu emprunté.
+- Vérification du fonctionnement avec la recherche par titre.
+
+**Statut :** Terminé.
