@@ -13,9 +13,9 @@ FEAT-03	Rendre un jeu	Terminé
 FEAT-04	Consulter les emprunts d'un adhérent	Terminé
 FEAT-05	Consulter les emprunts en retard	Terminé
 FEAT-06	Rechercher un jeu	Terminé
-FEAT-07	Filtrer les jeux disponibles	À faire
-BONUS-01	Authentification JWT	Facultatif
-BONUS-02	Intégration Bootstrap 5	Facultatif
+FEAT-07       Filtrer les jeux disponibles       Terminé
+BONUS-01      Authentification JWT               À faire
+BONUS-02      Intégration Bootstrap 5            Terminé
 
 ## Corrections des anomalies officielles
 
