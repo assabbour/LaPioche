@@ -247,26 +247,70 @@ async function loadMembers() {
   $("#members-list").replaceChildren(...members.map(memberRow));
 }
 
+// FEAT-02 : Afficher un adhérent avec ses actions.
 function memberRow(member) {
   return el(
     "li",
     { class: "row" },
-    el("div", { class: "row-main" }, el("p", {}, el("strong", {}, member.name)), el("p", { class: "meta" }, member.email)),
+
+    el(
+      "div",
+      { class: "row-main" },
+      el("p", {}, el("strong", {}, member.name)),
+      el("p", { class: "meta" }, member.email)
+    ),
+
+    el(
+      "div",
+      { class: "actions" },
+
+      button("Modifier", () => {
+        editingMember = member;
+        $("#member-dialog-title").textContent = "Modifier un·e adhérent·e";
+        memberForm.reset();
+        memberForm.elements.name.value = member.name;
+        memberForm.elements.email.value = member.email;
+        showFormError(memberDialog, null);
+        memberDialog.showModal();
+      }),
+
+      button("Supprimer", async () => {
+        if (!confirm(`Supprimer ${member.name} ?`)) return;
+
+        await run(async () => {
+          await api.deleteMember(member.id);
+          toast("Adhérent supprimé.");
+          await refresh();
+        });
+      })
+    )
   );
 }
 
 const memberDialog = $("#member-dialog");
 const memberForm = $("#member-form");
+// FEAT-02 : Adhérent en cours de modification (null = création).
+let editingMember = null;
 
 $("#add-member").addEventListener("click", () => {
+  editingMember = null;
+  $("#member-dialog-title").textContent = "Ajouter un·e adhérent·e";
   memberForm.reset();
   showFormError(memberDialog, null);
   memberDialog.showModal();
 });
 
-bindSubmit(memberDialog, memberForm, (data) =>
-  api.createMember({ name: data.get("name").trim(), email: data.get("email").trim() }),
-);
+// FEAT-02 : Créer ou modifier un adhérent selon le contexte.
+bindSubmit(memberDialog, memberForm, (data) => {
+  const member = {
+    name: data.get("name").trim(),
+    email: data.get("email").trim(),
+  };
+  if (editingMember) {
+    return api.updateMember(editingMember.id, member);
+  }
+  return api.createMember(member);
+});
 
 // --- Historique des emprunts -----------------------------------------------
 

@@ -109,20 +109,18 @@ async function request(method, path, body) {
 export const api = {
   listGames: () => request("GET", "/games"),
   createGame: (game) => request("POST", "/games", game),
-
   // FEAT-01 : Modifier un jeu.
   updateGame: (id, game) => request("PUT", `/games/${id}`, game),
-
   // FEAT-01 : Supprimer un jeu.
   deleteGame: (id) => request("DELETE", `/games/${id}`),
-
   listMembers: () => request("GET", "/members"),
   createMember: (member) => request("POST", "/members", member),
-
+  // FEAT-02 : Modifier un adhérent.
+  updateMember: (id, member) => request("PUT", `/members/${id}`, member),
+  // FEAT-02 : Supprimer un adhérent.
+  deleteMember: (id) => request("DELETE", `/members/${id}`),
   // EXTRA-01 : Récupérer l'historique des emprunts.
   listLoans: () => request("GET", "/loans"),
-
   borrow: (gameID, memberID) => request("POST", "/loans", { gameID, memberID }),
-
   returnLoan: (loanID) => request("POST", `/loans/${loanID}/return`),
 };

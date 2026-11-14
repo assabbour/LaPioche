@@ -8,8 +8,8 @@
 | BUG-02 | Durée d'emprunt — 14 jours | Terminé |
 | BUG-03 | Empêcher le double emprunt | Terminé |
 | BUG-04 | Jeu introuvable — HTTP 404 | Terminé |
-| FEAT-01 | Modifier et supprimer un jeu | À faire |
-| FEAT-02 | Modifier et supprimer un adhérent | À faire |
+| FEAT-01 | Modifier et supprimer un jeu | Terminé |
+| FEAT-02 | Modifier et supprimer un adhérent | Développé — tests frontend à vérifier |
 | FEAT-03 | Rendre un jeu | Développé — critères à vérifier |
 | FEAT-04 | Consulter les emprunts d'un adhérent | À faire |
 | FEAT-05 | Consulter les emprunts en retard | Partiellement développé |
@@ -69,6 +69,52 @@
 **Commit :** `fix: return 404 for unknown games`
 
 ## Fonctionnalités officielles développées
+
+### FEAT-01 — Modifier et supprimer un jeu
+
+**Fichiers :** `GameController.swift`, `GameTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`.
+
+**Besoin :** Permettre de modifier et supprimer un jeu.
+
+**Développement :**
+- Ajout de `PUT /games/:gameID`.
+- Ajout de `DELETE /games/:gameID`.
+- Vérification des contraintes liées aux emprunts.
+- Ajout des boutons « Modifier » et « Supprimer » dans le frontend.
+- Réutilisation du formulaire pour la modification.
+
+**Tests :**
+- Tests backend validés.
+- Modification et suppression vérifiées manuellement.
+
+**Commit :** `aa43760` — Fusionné dans `main`.
+
+**Statut :** Terminé.
+
+### FEAT-02 — Modifier et supprimer un adhérent
+
+**Fichiers :** `MemberController.swift`, `MemberTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`.
+
+**Besoin :** Modifier les informations d'un adhérent et permettre sa suppression sans perdre l'historique des emprunts.
+
+**Développement :**
+- Ajout de `PUT /members/:memberID`.
+- Vérification de l'unicité de l'adresse e-mail (`409 Conflict`).
+- Ajout de `DELETE /members/:memberID`.
+- Refus de suppression si l'adhérent possède un historique d'emprunts (`409 Conflict`).
+- Ajout des boutons « Modifier » et « Supprimer ».
+- Réutilisation du formulaire d'ajout pour la modification.
+- Affichage des erreurs en français.
+
+**Tests :**
+- `testUpdateMember` — Réussi.
+- `testUpdateMemberWithDuplicateEmailReturnsConflict` — Réussi.
+- `testDeleteMember` — Réussi.
+- `testDeleteMemberWithLoanHistoryReturnsConflict` — Réussi.
+- Backend : 30 tests réussis, 0 échec.
+- Frontend : modification et refus de suppression avec historique vérifiés manuellement.
+
+**Statut :** Développé — tests frontend à vérifier.
 
 ### FEAT-03 — Retour d'un jeu emprunté
 
