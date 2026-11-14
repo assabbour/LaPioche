@@ -108,6 +108,11 @@ async function request(method, path, body) {
 
 export const api = {
   listGames: () => request("GET", "/games"),
+  // FEAT-06 : Récupérer tous les jeux ou rechercher par titre.
+  listGames: (search = "") =>
+    request("GET", search
+      ? `/games?search=${encodeURIComponent(search)}`
+      : "/games"),
   createGame: (game) => request("POST", "/games", game),
   // FEAT-01 : Modifier un jeu.
   updateGame: (id, game) => request("PUT", `/games/${id}`, game),

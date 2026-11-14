@@ -21,12 +21,26 @@
   </header>
 
   <main>
+    <!-- Liste des jeux -->
     <section id="games" class="tab" hidden>
       <div class="section-head">
         <h2>Jeux</h2>
         <button type="button" id="add-game" class="primary">Ajouter un jeu</button>
       </div>
-      <p id="games-empty" class="empty" hidden>La ludothèque ne contient aucun jeu pour le moment. Cliquez sur « Ajouter un jeu » pour créer le premier.</p>
+
+      <!-- FEAT-06 : Rechercher un jeu par titre. -->
+      <input
+        type="search"
+        id="search-games"
+        placeholder="Rechercher un jeu par titre..."
+        aria-label="Rechercher un jeu par titre"
+      />
+
+      <p id="games-empty" class="empty" hidden>
+        La ludothèque ne contient aucun jeu pour le moment.
+        Cliquez sur « Ajouter un jeu » pour créer le premier.
+      </p>
+
       <ul id="games-list" class="cards"></ul>
     </section>
 

@@ -114,11 +114,21 @@ window.addEventListener("hashchange", refresh);
 
 // --- Jeux ------------------------------------------------------------------
 
+// FEAT-06 : Rechercher les jeux par titre.
 async function loadGames() {
-  const games = await api.listGames();
+  const search = $("#search-games").value.trim();
+  const games = await api.listGames(search);
+  $("#games-empty").textContent = search
+    ? "Aucun jeu ne correspond à votre recherche."
+    : "La ludothèque ne contient aucun jeu pour le moment. Cliquez sur « Ajouter un jeu » pour créer le premier.";
   $("#games-empty").hidden = games.length > 0;
   $("#games-list").replaceChildren(...games.map(gameCard));
 }
+
+// FEAT-06 : Relancer la recherche à chaque saisie.
+$("#search-games").addEventListener("input", () => {
+  run(loadGames);
+});
 
 function gameCard(game) {
   const players =
