@@ -2,21 +2,20 @@
 
 ## Suivi du backlog officiel
 
-| Ticket | Fonctionnalité | Statut |
-|---|---|---|
-| BUG-01 | Création d'un jeu — HTTP 201 | Terminé |
-| BUG-02 | Durée d'emprunt — 14 jours | Terminé |
-| BUG-03 | Empêcher le double emprunt | Terminé |
-| BUG-04 | Jeu introuvable — HTTP 404 | Terminé |
-| FEAT-01 | Modifier et supprimer un jeu | Terminé |
-| FEAT-02 | Modifier et supprimer un adhérent | Terminé |
-| FEAT-03 | Rendre un jeu | Terminé |
-| FEAT-04 | Consulter les emprunts d'un adhérent | Terminé |
-| FEAT-05 | Consulter les emprunts en retard | Partiellement développé |
-| FEAT-06 | Rechercher un jeu | À faire |
-| FEAT-07 | Filtrer les jeux disponibles | À faire |
-| BONUS-01 | Authentification JWT | Facultatif |
-| BONUS-02 | Intégration Bootstrap 5 | Facultatif |
+Ticket	Fonctionnalité	Statut
+BUG-01	Création d'un jeu — HTTP 201	Terminé
+BUG-02	Durée d'emprunt — 14 jours	Terminé
+BUG-03	Empêcher le double emprunt	Terminé
+BUG-04	Jeu introuvable — HTTP 404	Terminé
+FEAT-01	Modifier et supprimer un jeu	Terminé
+FEAT-02	Modifier et supprimer un adhérent	Terminé
+FEAT-03	Rendre un jeu	Terminé
+FEAT-04	Consulter les emprunts d'un adhérent	Terminé
+FEAT-05	Consulter les emprunts en retard	Terminé
+FEAT-06	Rechercher un jeu	Terminé
+FEAT-07	Filtrer les jeux disponibles	À faire
+BONUS-01	Authentification JWT	Facultatif
+BONUS-02	Intégration Bootstrap 5	Facultatif
 
 ## Corrections des anomalies officielles
 
@@ -190,3 +189,26 @@
 
 **Statut :** Terminé.
 
+## FEAT-06 — Rechercher un jeu par titre
+
+**Fichiers :** `GameController.swift`, `GameTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`, `front/style.css`.
+
+**Besoin :** Permettre de retrouver rapidement un jeu en saisissant son titre.
+
+**Développement réalisé :**
+
+- Ajout du paramètre optionnel `search` à la route `GET /games`.
+- Recherche des jeux par titre, sans distinction entre majuscules et minuscules.
+- Ajout d'un champ de recherche dans la page « Jeux ».
+- Actualisation de la liste lors de la saisie.
+- Affichage du message « Aucun jeu ne correspond à votre recherche » lorsqu'aucun résultat n'est trouvé.
+- Ajout d'un espacement entre le champ de recherche et les cartes.
+
+**Tests :**
+
+- Backend : 35 tests réussis, 0 échec.
+- Frontend : vérification des tests à confirmer.
+- Validation manuelle : recherche avec résultat et recherche sans résultat.
+- Vérification de l'affichage et de l'espacement dans Safari.
+
+**Statut :** Développement terminé, validation finale avant commit.

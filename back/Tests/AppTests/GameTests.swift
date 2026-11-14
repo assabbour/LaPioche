@@ -209,4 +209,45 @@ final class GameTests: XCTestCase {
             })
         }
     }
+
+    // FEAT-06 : Rechercher un jeu avec une partie de son titre.
+    func testSearchGamesByTitle() async throws {
+        try await withApp { app in
+            _ = try await createGame(app, title: "Les Aventuriers du Rail")
+            _ = try await createGame(app, title: "Catan")
+            _ = try await createGame(app, title: "Dixit")
+            try await app.test(.GET, "games?search=Aventuriers", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                let games = try res.content.decode([GameDTO].self)
+                XCTAssertEqual(games.count, 1)
+                XCTAssertEqual(games.first?.title, "Les Aventuriers du Rail")
+            })
+        }
+    }
+
+    // FEAT-06 : Une recherche sans correspondance retourne une liste vide.
+    func testSearchGamesWithoutResults() async throws {
+        try await withApp { app in
+            _ = try await createGame(app, title: "Catan")
+            try await app.test(.GET, "games?search=Monopoly", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                let games = try res.content.decode([GameDTO].self)
+                XCTAssertTrue(games.isEmpty)
+            })
+        }
+    }
+
+    // FEAT-06 : Sans recherche, tous les jeux restent accessibles.
+    func testSearchGamesWithoutFilter() async throws {
+        try await withApp { app in
+            _ = try await createGame(app, title: "Catan")
+            _ = try await createGame(app, title: "Dixit")
+            try await app.test(.GET, "games", afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                let games = try res.content.decode([GameDTO].self)
+                XCTAssertEqual(games.count, 2)
+            })
+        }
+    }
+
 }

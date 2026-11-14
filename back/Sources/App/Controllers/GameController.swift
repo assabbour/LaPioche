@@ -13,11 +13,19 @@ struct GameController: RouteCollection {
         games.delete(":gameID", use: delete)
     }
 
+    // FEAT-06 : Rechercher un jeu par son titre.
     @Sendable
     func index(req: Request) async throws -> [GameDTO] {
-        let games = try await Game.query(on: req.db)
+        let search = try req.query.get(String?.self, at: "search")
+
+        var query = Game.query(on: req.db)
             .with(\.$loans)
-            .all()
+
+        if let search, !search.isEmpty {
+            query = query.filter(\.$title ~~ "%\(search)%")
+        }
+
+        let games = try await query.all()
         return games.map { $0.toDTO() }
     }
 
