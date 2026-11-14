@@ -11,6 +11,8 @@ struct MemberController: RouteCollection {
         members.put(":memberID", use: update)
         // FEAT-02 : Supprimer un adhérent existant.
         members.delete(":memberID", use: delete)
+        // FEAT-04 : Consulter les emprunts d'un adhérent.
+        members.get(":memberID", "loans", use: loans)
     }
 
     @Sendable
@@ -88,5 +90,22 @@ struct MemberController: RouteCollection {
         }
         try await member.delete(on: req.db)
         return .noContent
+    }
+
+    // FEAT-04 : Récupérer les emprunts d'un adhérent.
+    @Sendable
+    func loans(req: Request) async throws -> [LoanDTO] {
+        guard let memberID = req.parameters.get("memberID", as: UUID.self) else {
+            throw Abort(.badRequest, reason: "Invalid member id")
+        }
+        guard let member = try await Member.find(memberID, on: req.db) else {
+            throw Abort(.notFound, reason: "Member not found")
+        }
+        let loans = try await Loan.query(on: req.db)
+            .filter(\.$member.$id == member.requireID())
+            .sort(\.$borrowedAt, .ascending)
+            .all()
+
+        return loans.map { $0.toDTO() }
     }
 }

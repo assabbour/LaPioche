@@ -139,6 +139,29 @@
 
 **Statut :** Fonctionnalité développée. Vérifier la couverture des erreurs `404`, `409` et du refus affiché en français.
 
+### FEAT-04 — Consulter les emprunts d'un adhérent
+
+**Fichiers :** `MemberController.swift`, `MemberTests.swift`, `front/api.js`, `front/app.js`, `front/index.html`.
+
+**Besoin :** Permettre de consulter l'historique des emprunts d'un adhérent, y compris les jeux déjà rendus.
+
+**Développement :**
+- Ajout de `GET /members/:memberID/loans`.
+- Récupération des emprunts par ordre chronologique.
+- Gestion des erreurs `400` (identifiant invalide) et `404` (adhérent inexistant).
+- Ajout du bouton « Voir les emprunts » dans la liste des adhérents.
+- Réutilisation de l'affichage de l'historique existant.
+- Ajout du bouton « Tous les emprunts » pour revenir à l'historique global.
+
+**Tests :**
+- Backend : `testGetMemberLoans` — réussi.
+- Backend : 31 tests réussis, 0 échec.
+- Frontend : 2 fichiers de tests réussis, 0 échec.
+- Validation manuelle : affichage de l'historique d'un adhérent et retour à l'historique global.
+
+**Statut :** Terminé.
+
+
 ### FEAT-05 — Emprunts en retard
 
 *Ancienne référence interne : BUG-08*

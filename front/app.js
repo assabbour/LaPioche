@@ -71,6 +71,8 @@ function bindSubmit(dialog, form, handler) {
 
 // EXTRA-01 : Ajouter l'onglet Historique.
 const tabs = ["games", "members", "loans"];
+// FEAT-04 : Adhérent sélectionné pour consulter ses emprunts.
+let selectedMember = null;
 
 function currentTab() {
   const name = location.hash.slice(1);
@@ -79,18 +81,19 @@ function currentTab() {
 
 async function refresh() {
   const tab = currentTab();
-
+  // L'onglet Historique affiche toujours tous les emprunts par défaut.
+  if (tab !== "loans") {
+    selectedMember = null;
+  }
   for (const name of tabs) {
     $(`#${name}`).hidden = name !== tab;
     $(`[data-tab="${name}"]`).toggleAttribute("aria-current", name === tab);
   }
-
   const loaders = {
     games: loadGames,
     members: loadMembers,
     loans: loadLoans,
   };
-
   await run(loaders[tab]);
 }
 
@@ -264,6 +267,12 @@ function memberRow(member) {
       "div",
       { class: "actions" },
 
+      // FEAT-04 : Afficher les emprunts de cet adhérent.
+      button("Voir les emprunts", () => {
+        selectedMember = member;
+        location.hash = "#loans";
+      }),
+
       button("Modifier", () => {
         editingMember = member;
         $("#member-dialog-title").textContent = "Modifier un·e adhérent·e";
@@ -317,13 +326,17 @@ bindSubmit(memberDialog, memberForm, (data) => {
 // EXTRA-01 : Charger les emprunts et retrouver les noms des jeux et adhérent·es.
 async function loadLoans() {
   const [loans, games, members] = await Promise.all([
-    api.listLoans(),
+    selectedMember
+      ? api.listMemberLoans(selectedMember.id)
+      : api.listLoans(),
     api.listGames(),
     api.listMembers(),
   ]);
-
+  $("#loans-title").textContent = selectedMember
+    ? `Emprunts de ${selectedMember.name}`
+    : "Historique des emprunts";
+  $("#all-loans").hidden = !selectedMember;
   $("#loans-empty").hidden = loans.length > 0;
-
   $("#loans-list").replaceChildren(
     ...loans.map((loan) => {
       const game = games.find((g) => g.id === loan.gameID);
@@ -358,6 +371,12 @@ async function loadLoans() {
     }),
   );
 }
+
+// FEAT-04 : Revenir à l'historique global.
+$("#all-loans").addEventListener("click", () => {
+  selectedMember = null;
+  refresh();
+});
 
 refresh();
 

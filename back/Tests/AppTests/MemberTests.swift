@@ -129,4 +129,44 @@ final class MemberTests: XCTestCase {
             }
         }
     }
+
+    // FEAT-04 : Consulter les emprunts en cours et rendus d'un adhérent.
+    func testGetMemberLoans() async throws {
+        try await withApp { app in
+            let member = try await createMember(app)
+            let memberID = try XCTUnwrap(member.id)
+            try await app.test(.GET, "members/\(memberID)/loans") { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertTrue(try res.content.decode([LoanDTO].self).isEmpty)
+            }
+            let game = try await createGame(app)
+            let gameID = try XCTUnwrap(game.id)
+            var loanID: UUID?
+            try await app.test(.POST, "loans", beforeRequest: { req in
+                try req.content.encode(
+                    CreateLoanDTO(gameID: gameID, memberID: memberID)
+                )
+            }, afterResponse: { res async throws in
+                XCTAssertEqual(res.status, .created)
+                loanID = try res.content.decode(LoanDTO.self).id
+            })
+            try await app.test(.GET, "members/\(memberID)/loans") { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                let loans = try res.content.decode([LoanDTO].self)
+                XCTAssertEqual(loans.count, 1)
+                XCTAssertEqual(loans.first?.memberID, memberID)
+                XCTAssertNil(loans.first?.returnedAt)
+            }
+            let id = try XCTUnwrap(loanID)
+            try await app.test(.POST, "loans/\(id)/return") { res async throws in
+                XCTAssertEqual(res.status, .ok)
+            }
+            try await app.test(.GET, "members/\(memberID)/loans") { res async throws in
+                XCTAssertEqual(res.status, .ok)
+                let loans = try res.content.decode([LoanDTO].self)
+                XCTAssertEqual(loans.count, 1)
+                XCTAssertNotNil(loans.first?.returnedAt)
+            }
+        }
+    }
 }

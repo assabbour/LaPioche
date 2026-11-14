@@ -119,6 +119,8 @@ export const api = {
   updateMember: (id, member) => request("PUT", `/members/${id}`, member),
   // FEAT-02 : Supprimer un adhérent.
   deleteMember: (id) => request("DELETE", `/members/${id}`),
+  // FEAT-04 : Historique des emprunts d'un adhérent.
+  listMemberLoans: (id) => request("GET", `/members/${id}/loans`),
   // EXTRA-01 : Récupérer l'historique des emprunts.
   listLoans: () => request("GET", "/loans"),
   borrow: (gameID, memberID) => request("POST", "/loans", { gameID, memberID }),
