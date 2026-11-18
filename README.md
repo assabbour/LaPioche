@@ -68,6 +68,19 @@ Le projet se compose de deux serveurs qui tournent en même temps, chacun dans s
 
 ### 1. L'API (back)
 
+**Démarrage avec authentification JWT (BONUS-01)**
+
+Pour démarrer l'API avec l'authentification JWT, utilisez :
+
+```bash
+cd back
+sh start.sh
+```
+
+Le script génère automatiquement une clé JWT locale lors du premier lancement et la conserve dans `back/.env` (ignoré par Git).
+
+Aucune configuration manuelle n'est nécessaire. Vous pouvez ensuite ouvrir le frontend pour tester l'inscription et la connexion.
+
 ```bash
 cd back
 swift run

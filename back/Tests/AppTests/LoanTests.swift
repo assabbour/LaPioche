@@ -8,7 +8,9 @@ final class LoanTests: XCTestCase {
         memberID: UUID,
         afterResponse: (XCTHTTPResponse) async throws -> Void
     ) async throws {
+        let token = try await getTestToken(app)
         try await app.test(.POST, "loans", beforeRequest: { req in
+            req.headers.bearerAuthorization = .init(token: token)
             try req.content.encode(CreateLoanDTO(gameID: gameID, memberID: memberID))
         }, afterResponse: afterResponse)
     }
@@ -55,7 +57,10 @@ final class LoanTests: XCTestCase {
 
             try await borrow(app, gameID: gameID, memberID: try XCTUnwrap(member.id)) { _ in }
 
-            try await app.test(.GET, "games/\(gameID)", afterResponse: { res async throws in
+            let token = try await getTestToken(app)
+            try await app.test(.GET, "games/\(gameID)", beforeRequest: { req in
+                req.headers.bearerAuthorization = .init(token: token)
+            }, afterResponse: { res async throws in
                 XCTAssertFalse(try res.content.decode(GameDTO.self).isAvailable)
             })
         }
@@ -115,17 +120,22 @@ final class LoanTests: XCTestCase {
 
             let id = try XCTUnwrap(loanID)
 
-            try await app.test(.POST, "loans/\(id)/return") { res async throws in
+            let token = try await getTestToken(app)
+            try await app.test(.POST, "loans/\(id)/return", beforeRequest: { req in
+                req.headers.bearerAuthorization = .init(token: token)
+            }, afterResponse: { res async throws in
                 XCTAssertEqual(res.status, .ok)
                 let loan = try res.content.decode(LoanDTO.self)
                 XCTAssertNotNil(loan.returnedAt)
-            }
+            })
 
-            try await app.test(.GET, "games/\(gameID)") { res async throws in
+            try await app.test(.GET, "games/\(gameID)", beforeRequest: { req in
+                req.headers.bearerAuthorization = .init(token: token)
+            }, afterResponse: { res async throws in
                 let game = try res.content.decode(GameDTO.self)
                 XCTAssertTrue(game.isAvailable)
                 XCTAssertNil(game.activeLoanID)
-            }
+            })
         }
     }
 
@@ -153,7 +163,10 @@ final class LoanTests: XCTestCase {
                 try await loan.save(on: app.db)
             }
 
-            try await app.test(.GET, "loans") { res async throws in
+            let token = try await getTestToken(app)
+            try await app.test(.GET, "loans", beforeRequest: { req in
+                req.headers.bearerAuthorization = .init(token: token)
+            }, afterResponse: { res async throws in
                 XCTAssertEqual(res.status, .ok)
 
                 let history = try res.content.decode([LoanDTO].self)
@@ -161,7 +174,7 @@ final class LoanTests: XCTestCase {
                 XCTAssertEqual(history.count, 2)
                 XCTAssertEqual(history[0].gameID, gameID2)
                 XCTAssertEqual(history[1].gameID, gameID1)
-            }
+            })
         }
     }
 
@@ -192,13 +205,16 @@ final class LoanTests: XCTestCase {
                 }
                 try await loan.save(on: app.db)
             }
-            try await app.test(.GET, "loans/overdue") { res async throws in
+            let token = try await getTestToken(app)
+            try await app.test(.GET, "loans/overdue", beforeRequest: { req in
+                req.headers.bearerAuthorization = .init(token: token)
+            }, afterResponse: { res async throws in
                 XCTAssertEqual(res.status, .ok)
                 let overdue = try res.content.decode([LoanDTO].self)
                 XCTAssertEqual(overdue.count, 1)
                 XCTAssertEqual(overdue[0].gameID, game1.id)
                 XCTAssertNil(overdue[0].returnedAt)
-            }
+            })
         }
     }
 

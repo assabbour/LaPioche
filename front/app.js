@@ -35,9 +35,12 @@ function button(label, onClick, className = "") {
 }
 
 function toast(message, isError = false) {
-  const node = el("p", { class: isError ? "toast error" : "toast" }, message);
+  const node = el("p", {
+    class: isError ? "app-toast error" : "app-toast"
+  }, message);
+
   $("#toasts").append(node);
-  setTimeout(() => node.remove(), 5000);
+  setTimeout(() => node.remove(), isError ? 12000 : 5000);
 }
 
 // Exécute une action déclenchée par un bouton et affiche l'erreur de l'API.
@@ -76,6 +79,83 @@ function bindSubmit(dialog, form, handler) {
   });
 }
 
+// BONUS-01 : Connexion JWT
+
+const loginDialog = $("#login-dialog");
+const loginForm = $("#login-form");
+
+// Ouvrir la fenêtre de connexion
+$("#login-button").addEventListener("click", () => {
+  loginForm.reset();
+  showFormError(loginDialog, null);
+  loginDialog.showModal();
+});
+
+// Envoyer les identifiants à Vapor
+bindSubmit(loginDialog, loginForm, async (formData) => {
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  const response = await api.login(email, password);
+
+  // Sauvegarder le JWT
+  sessionStorage.setItem("token", response.token);
+
+  // Actualiser les boutons
+  updateAuthButtons();
+
+  toast("Connexion réussie !");
+});
+
+// Afficher les boutons selon l'état de connexion
+function updateAuthButtons() {
+  const connected = Boolean(sessionStorage.getItem("token"));
+
+  $("#login-button").hidden = connected;
+  $("#register-button").hidden = connected;
+  $("#logout-button").hidden = !connected;
+
+  // Afficher l'accueil uniquement si l'utilisateur est déconnecté
+  $("#home").hidden = connected;
+
+  // Navigation réservée aux utilisateurs connectés
+  for (const name of ["games", "members", "loans"]) {
+    $(`[data-tab="${name}"]`).hidden = !connected;
+  }
+}
+
+updateAuthButtons();
+
+// BONUS-01 : Inscription
+const registerDialog = $("#register-dialog");
+const registerForm = $("#register-form");
+
+$("#register-button").addEventListener("click", () => {
+  registerForm.reset();
+  showFormError(registerDialog, null);
+  registerDialog.showModal();
+});
+
+bindSubmit(registerDialog, registerForm, async (formData) => {
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  const response = await api.register(email, password);
+
+  sessionStorage.setItem("token", response.token);
+  updateAuthButtons();
+
+  toast("Inscription réussie !");
+});
+
+// BONUS-01 : Déconnexion
+$("#logout-button").addEventListener("click", async () => {
+  sessionStorage.removeItem("token");
+  updateAuthButtons();
+  toast("Déconnexion réussie !");
+  await run(refresh);
+});
+
 // --- Onglets ---------------------------------------------------------------
 
 // EXTRA-01 : Ajouter l'onglet Historique.
@@ -101,20 +181,39 @@ async function updateOverdueCount() {
 
 async function refresh() {
   const tab = currentTab();
-  // L'onglet Historique affiche toujours tous les emprunts par défaut.
+  const connected = Boolean(sessionStorage.getItem("token"));
+
+  // Afficher l'accueil uniquement si l'utilisateur est déconnecté
+  $("#home").hidden = connected;
+
+  // Masquer les sections si l'utilisateur n'est pas connecté
+  if (!connected) {
+    for (const name of tabs) {
+      $(`#${name}`).hidden = true;
+    }
+
+    $("#overdue-count").hidden = true;
+    return;
+  }
+
+  // Réinitialiser les filtres
   if (tab !== "loans") {
     selectedMember = null;
     showOverdue = false;
   }
+
+  // Afficher l'onglet sélectionné
   for (const name of tabs) {
     $(`#${name}`).hidden = name !== tab;
     $(`[data-tab="${name}"]`).toggleAttribute("aria-current", name === tab);
   }
+
   const loaders = {
     games: loadGames,
     members: loadMembers,
     loans: loadLoans,
   };
+
   await run(updateOverdueCount);
   await run(loaders[tab]);
 }
@@ -193,19 +292,27 @@ async function deleteGame(game) {
 
   if (!confirmed) return;
 
-  await run(async () => {
+  try {
     await api.deleteGame(game.id);
 
     toast(`« ${game.title} » a bien été supprimé.`);
-
     await refresh();
-  });
+
+  } catch (error) {
+    if (error.status === 409) {
+      toast(
+        "Suppression impossible : ce jeu possède un historique d'emprunts.",
+        true
+      );
+    } else {
+      toast(error.message, true);
+    }
+  }
 }
 
+// FEAT-01 : Jeu en cours de modification (null = création).
 const gameDialog = $("#game-dialog");
 const gameForm = $("#game-form");
-
-// FEAT-01 : Jeu en cours de modification (null = création).
 let editingGame = null;
 
 function openEditGameDialog(game) {
@@ -327,14 +434,23 @@ function memberRow(member) {
       }),
 
       button("Supprimer", async () => {
-        if (!confirm(`Supprimer ${member.name} ?`)) return;
+      if (!confirm(`Supprimer ${member.name} ?`)) return;
 
-        await run(async () => {
-          await api.deleteMember(member.id);
-          toast("Adhérent supprimé.");
-          await refresh();
-        });
-      })
+      try {
+        await api.deleteMember(member.id);
+        toast("Adhérent supprimé.");
+        await refresh();
+      } catch (error) {
+        if (error.status === 409) {
+          toast(
+            "Suppression impossible : cet adhérent possède un historique d'emprunts.",
+            true
+          );
+        } else {
+          toast(error.message, true);
+        }
+      }
+    })
     )
   );
 }
