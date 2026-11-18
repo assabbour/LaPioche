@@ -62,6 +62,7 @@ export async function mountApp(routes, { hash = "" } = {}) {
   const prelude = `<base href="${pageURL.href}">
     <script>
       window.fetch = window.parent.__fakeFetch;
+      sessionStorage.setItem("token", "jwt-test-token");
       history.replaceState(null, "", "${hash}" || location.pathname);
     <\/script>`;
 

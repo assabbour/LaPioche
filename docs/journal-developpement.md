@@ -113,7 +113,7 @@
 - Backend : 30 tests réussis, 0 échec.
 - Frontend : modification et refus de suppression avec historique vérifiés manuellement.
 
-**Statut :** Développé — tests frontend à vérifier.
+**Statut :** Terminé — tests validés.
 
 ### FEAT-03 — Retour d'un jeu emprunté
 
@@ -136,7 +136,7 @@
 
 **Commit :** `0752fd6` — Fusionné dans `main`.
 
-**Statut :** Fonctionnalité développée. Vérifier la couverture des erreurs `404`, `409` et du refus affiché en français.
+**Statut :** Terminé — tests automatisés validés.
 
 ### FEAT-04 — Consulter les emprunts d'un adhérent
 
@@ -207,11 +207,11 @@
 **Tests :**
 
 - Backend : 35 tests réussis, 0 échec.
-- Frontend : vérification des tests à confirmer.
+- Frontend : tests automatisés validés.
 - Validation manuelle : recherche avec résultat et recherche sans résultat.
 - Vérification de l'affichage et de l'espacement dans Safari.
 
-**Statut :** Développement terminé, validation finale avant commit.
+**Statut :** Terminé — tests validés.
 
 ## FEAT-07 — Filtrer les jeux disponibles
 
@@ -276,11 +276,10 @@ sh start.sh
 Le script génère automatiquement une clé JWT locale au premier lancement.
 
 ### Tests
-- Inscription : réussie.
-- Connexion : réussie.
-- Déconnexion : réussie.
-- Accès aux jeux après authentification : réussi.
-- Tests automatisés JWT : à vérifier.
+- Inscription, connexion et déconnexion : réussies.
+- Protection des routes par JWT : validée.
+- Tests backend JWT : 11 tests réussis.
+- Tests frontend : 25 tests réussis.
 
 ## BONUS-02 — Intégration de Bootstrap 5
 
