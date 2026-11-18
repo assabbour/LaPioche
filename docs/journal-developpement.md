@@ -1,21 +1,21 @@
 # Journal de développement — La Pioche
 
 ## Suivi du backlog officiel
-
-Ticket	Fonctionnalité	Statut
-BUG-01	Création d'un jeu — HTTP 201	Terminé
-BUG-02	Durée d'emprunt — 14 jours	Terminé
-BUG-03	Empêcher le double emprunt	Terminé
-BUG-04	Jeu introuvable — HTTP 404	Terminé
-FEAT-01	Modifier et supprimer un jeu	Terminé
-FEAT-02	Modifier et supprimer un adhérent	Terminé
-FEAT-03	Rendre un jeu	Terminé
-FEAT-04	Consulter les emprunts d'un adhérent	Terminé
-FEAT-05	Consulter les emprunts en retard	Terminé
-FEAT-06	Rechercher un jeu	Terminé
-FEAT-07	Filtrer les jeux disponibles	À faire
-BONUS-01	Authentification JWT	Facultatif
-BONUS-02	Intégration Bootstrap 5	Facultatif
+| Ticket | Fonctionnalité | Statut |
+|---|---|---|
+| BUG-01 | Création d'un jeu — HTTP 201 | Terminé |
+| BUG-02 | Durée d'emprunt — 14 jours | Terminé |
+| BUG-03 | Empêcher le double emprunt | Terminé |
+| BUG-04 | Jeu introuvable — HTTP 404 | Terminé |
+| FEAT-01 | Modifier et supprimer un jeu | Terminé |
+| FEAT-02 | Modifier et supprimer un adhérent | Terminé |
+| FEAT-03 | Rendre un jeu | Terminé |
+| FEAT-04 | Consulter les emprunts d'un adhérent | Terminé |
+| FEAT-05 | Consulter les emprunts en retard | Terminé |
+| FEAT-06 | Rechercher un jeu | Terminé |
+| FEAT-07 | Filtrer les jeux disponibles | Terminé |
+| BONUS-01 | Authentification JWT | Terminé |
+| BONUS-02 | Intégration Bootstrap 5 | Terminé |
 
 ## Corrections des anomalies officielles
 
@@ -235,6 +235,52 @@ BONUS-02	Intégration Bootstrap 5	Facultatif
 - Vérification du fonctionnement avec la recherche par titre.
 
 **Statut :** Terminé.
+
+## BONUS-01 — Authentification JWT
+
+**Statut : Terminé**
+
+### Modifications
+- Création des routes d'inscription, de connexion et de récupération de l'utilisateur.
+- Sécurisation des routes avec un middleware JWT.
+- Hachage des mots de passe avec bcrypt.
+- Stockage du token dans `sessionStorage`.
+- Ajout des boutons Connexion, Inscription et Déconnexion.
+- Génération automatique de la clé JWT via `back/start.sh`.
+
+### Fichiers principaux
+- `back/Sources/App/Controllers/AuthController.swift`
+- `back/Sources/App/Middleware/JWTMiddleware.swift`
+- `back/Sources/App/Models/User.swift`
+- `back/Sources/App/routes.swift`
+- `back/start.sh`
+- `front/index.html`
+- `front/api.js`
+- `front/app.js`
+
+### Fonctionnement
+1. L'utilisateur s'inscrit avec son e-mail et son mot de passe.
+2. Le backend crée le compte et retourne un token JWT.
+3. Le frontend conserve le token dans `sessionStorage`.
+4. Le token est envoyé automatiquement avec les requêtes protégées.
+5. Le middleware vérifie le token avant d'autoriser l'accès.
+6. La déconnexion supprime le token du navigateur.
+
+### Démarrage
+Depuis le dossier `back/` :
+
+```bash
+sh start.sh
+```
+
+Le script génère automatiquement une clé JWT locale au premier lancement.
+
+### Tests
+- Inscription : réussie.
+- Connexion : réussie.
+- Déconnexion : réussie.
+- Accès aux jeux après authentification : réussi.
+- Tests automatisés JWT : à vérifier.
 
 ## BONUS-02 — Intégration de Bootstrap 5
 

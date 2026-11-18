@@ -89,7 +89,12 @@ async function request(method, path, body) {
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
-      headers: body === undefined ? {} : { "Content-Type": "application/json" },
+      headers: {
+        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+        ...(sessionStorage.getItem("token")
+          ? { Authorization: `Bearer ${sessionStorage.getItem("token")}` }
+          : {}),
+      },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {
@@ -107,7 +112,11 @@ async function request(method, path, body) {
 }
 
 export const api = {
-  listGames: () => request("GET", "/games"),
+  // BONUS-01 : Authentification
+  login: (email, password) =>
+    request("POST", "/auth/login", { email, password }),
+  register: (email, password) =>
+    request("POST", "/auth/register", { email, password }),
   // FEAT-06 : Récupérer tous les jeux ou rechercher par titre.
   listGames: (search = "") =>
     request("GET", search

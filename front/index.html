@@ -22,9 +22,50 @@
       </a>
     </nav>
     <a class="docs-link" id="docs-link" href="http://localhost:8081/">Documentation API</a>
+    <div id="auth-actions" class="d-flex gap-2 align-items-center">
+      <button type="button" id="login-button" class="btn btn-outline-primary">
+        Connexion
+      </button>
+      <button type="button" id="register-button" class="btn btn-primary">
+        Inscription
+      </button>
+      <button type="button" id="logout-button" class="btn btn-outline-danger" hidden>
+        Déconnexion
+      </button>
+    </div>
   </header>
 
   <main>
+
+    <!-- Accueil public -->
+    <section id="home" class="home">
+      <h2>Bienvenue sur La Pioche</h2>
+      <p>Votre ludothèque, simplement.</p>
+      <p>Gérez vos jeux, vos adhérents et vos emprunts depuis une seule application.</p>
+
+      <div class="home-cards">
+        <article class="card">
+          <h3>Jeux</h3>
+          <p>Consultez et gérez le catalogue des jeux.</p>
+        </article>
+
+        <article class="card">
+          <h3>Adhérents</h3>
+          <p>Retrouvez les membres de la ludothèque.</p>
+        </article>
+
+        <article class="card">
+          <h3>Emprunts</h3>
+          <p>Suivez les emprunts et les retours des jeux.</p>
+        </article>
+      </div>
+
+      <p>
+        Connectez-vous ou inscrivez-vous pour accéder aux jeux,
+        aux adhérents et à l'historique des emprunts.
+      </p>
+    </section>
+
     <!-- Liste des jeux -->
     <section id="games" class="tab" hidden>
       <div class="section-head">
@@ -84,6 +125,75 @@
       <ul id="loans-list" class="rows"></ul>
     </section>
   </main>
+
+  <!-- BONUS-01 : Formulaire d'inscription -->
+  <dialog id="register-dialog">
+    <form id="register-form" novalidate>
+      <h2>Inscription</h2>
+
+      <label>
+        Adresse e-mail
+        <input
+          type="email"
+          name="email"
+          class="form-control"
+          required
+        >
+      </label>
+
+      <label>
+        Mot de passe (8 caractères minimum)
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          minlength="8"
+          required
+        >
+      </label>
+
+      <p class="form-error" role="alert" hidden></p>
+
+      <div class="actions">
+        <button type="button" data-cancel>Annuler</button>
+        <button type="submit" class="primary">S'inscrire</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- BONUS-01 : Formulaire de connexion -->
+  <dialog id="login-dialog">
+    <form id="login-form" novalidate>
+      <h2>Connexion</h2>
+
+      <label>
+        Adresse e-mail
+        <input
+          type="email"
+          name="email"
+          class="form-control"
+          required
+        >
+      </label>
+
+      <label>
+        Mot de passe
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          required
+        >
+      </label>
+
+      <p class="form-error" role="alert" hidden></p>
+
+      <div class="actions">
+        <button type="button" data-cancel>Annuler</button>
+        <button type="submit" class="primary">Se connecter</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog id="game-dialog">
     <form method="dialog" id="game-form" novalidate>
